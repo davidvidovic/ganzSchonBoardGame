@@ -1,4 +1,4 @@
-#include "dices.h"
+#include "../include/dices.h"
 
 namespace engine {
 

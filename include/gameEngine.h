@@ -10,13 +10,12 @@ namespace engine
 
 class GameEngine {
     private:
-    Player player; // should this be a vector, or Players?
+    std::vector<Player> players;
     Dices dices;
-    // playerSequence; ? 
-    // round (1, 2, 3, 4)
 
     public:
-    GameEngine();
+    void addPlayer(Player& player);
+    void removePlayer(Player& player);
 };
 
 }

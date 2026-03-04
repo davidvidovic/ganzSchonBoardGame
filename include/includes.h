@@ -1,6 +1,8 @@
 #ifndef INCLUDES_H
 #define INCLUDES_H
 
+namespace engine {
+
 namespace GameColor{
 typedef enum GameColor { WHITE, BLUE, YELLOW, PURPLE, GREEN, ORANGE } GameColor;
 }
@@ -14,5 +16,7 @@ const int BLUE_BOARD_LENGTH = 12;
 const int GREEN_BOARD_LENGTH = 11;
 const int ORANGE_BOARD_LENGTH = 11;
 const int PURPLE_BOARD_LENGTH = 11;
+
+}
 
 #endif
