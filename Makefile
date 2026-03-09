@@ -3,8 +3,8 @@ CXX = g++
 CXXFLAGS = -std=c++20 -Wall -Wextra -Iinclude
 
 # Directories
-SRC_DIR = src
-BUILD_DIR = build
+SRC_DIR = engine/src
+BUILD_DIR = engine/build
 
 # Find all .cpp files
 SRCS = $(wildcard $(SRC_DIR)/*.cpp)

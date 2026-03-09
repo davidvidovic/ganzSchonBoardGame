@@ -42,7 +42,7 @@ class YellowBoard : BooleanBoard {
 
     std::vector<int> isPlayable(int diceValue) override {
         std::vector<int> playableCoordinates{};
-        for(int i; i < board_box_requirements.size(); i++)
+        for(size_t i = 0; i < board_box_requirements.size(); i++)
         {
             if(diceValue == board_box_requirements[i])
                 playableCoordinates.push_back(i);

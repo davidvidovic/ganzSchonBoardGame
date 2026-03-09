@@ -32,7 +32,6 @@ class Dice {
 
     void rollDice();
 
-
     friend bool operator== (const Dice& c1, const Dice& c2);
     friend bool operator!= (const Dice& c1, const Dice& c2);
 

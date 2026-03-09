@@ -25,13 +25,13 @@ class OrangeBoard : NumericBoard {
         };
     }
 
-    std::vector<int> isPlayable(int diceValue) override {
+    std::vector<int> isPlayable([[maybe_unused]] int diceValue) override {
         if(currentIndex >= ORANGE_BOARD_LENGTH) return {};
 
         return {currentIndex+1};
     }
     
-    void play(int diceValue) override {
+    void play([[maybe_unused]] int diceValue) override {
         int new_value = diceValue * board_multipliers[currentIndex];
         score += new_value;
         board_values[currentIndex] = new_value;

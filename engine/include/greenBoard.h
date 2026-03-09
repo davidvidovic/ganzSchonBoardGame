@@ -34,7 +34,7 @@ class GreenBoard : BooleanBoard {
             return {};
     }
     
-    void play(int diceValue) override {
+    void play([[maybe_unused]] int diceValue) override {
         score = (currentIndex+1)*(currentIndex+2)/2;
         board_state[currentIndex] = true;
         currentIndex++;
