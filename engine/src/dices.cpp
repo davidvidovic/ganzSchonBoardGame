@@ -30,4 +30,12 @@ void Dices::sortDices() {
     std::sort(dices.begin(), dices.end());
 }
 
+Dice Dices::getDice(int color) {
+    for(auto& dice : dices) {
+        if(dice.getColor() == color) {
+            return dice;
+        }
+    }
+}
+
 }

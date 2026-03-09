@@ -1,40 +1,31 @@
-# Compiler
 CXX = g++
 CXXFLAGS = -std=c++20 -Wall -Wextra -Iinclude
 
-# Directories
-SRC_DIR = engine/src
-BUILD_DIR = engine/build
+SRC_DIRS = engine/src server
+BUILD_DIR = build
 
-# Find all .cpp files
-SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+# Find all source files
+SRCS = $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.cpp))
 
-# Convert src/file.cpp → build/file.o
-OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
+# Convert source files to object files
+OBJS = $(patsubst %.cpp,$(BUILD_DIR)/%.o,$(SRCS))
 
-# Final executable name
 TARGET = $(BUILD_DIR)/game
 
-# Default target
-all: $(BUILD_DIR) $(TARGET)
-
-# Create build directory if it doesn't exist
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
+all: $(TARGET)
 
 # Link
 $(TARGET): $(OBJS)
 	$(CXX) $(OBJS) -o $(TARGET)
 
-# Compile
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+# Compile rule
+$(BUILD_DIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Clean
 clean:
 	rm -rf $(BUILD_DIR)
 
-# Rebuild
 re: clean all
 
 .PHONY: all clean re
