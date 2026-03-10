@@ -27,9 +27,16 @@ std::vector<Player> GameEngine::getPlayers() {
     return players;
 }
 
-Dices GameEngine::getDices() {
+Dices& GameEngine::getDices() {
     return dices;
 }
 
+void GameEngine::rollDices() {
+    dices.rollDices();
+}
+
+void GameEngine::sortDices() {
+    dices.sortDices();
+}
 
 }

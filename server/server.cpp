@@ -6,16 +6,18 @@ engine::GameEngine game;
 int main()
 {
     crow::SimpleApp app;
+    crow::mustache::set_global_base("server/templates");
 
     CROW_ROUTE(app,"/")
     ([](){
-        return "Welcome!\nLets play!";
+        auto page = crow::mustache::load_text("home.html");
+        return page;
     });
 
     CROW_ROUTE(app,"/rollDice").methods("GET"_method)
     ([](){
-        game.getDices().rollDices();
-        game.getDices().sortDices();
+        game.rollDices();
+        game.sortDices();
 
         crow::json::wvalue dices;
         dices["blue"] = game.getDices().getDice(engine::GameColor::BLUE).getValue();
