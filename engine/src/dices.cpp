@@ -11,7 +11,7 @@ Dices::Dices() : dices{
     Dice(GameColor::ORANGE)
 } {}
 
-std::vector<Dice> Dices::getDices() {
+const std::vector<Dice> Dices::getDices() const {
     return dices;
 }
 

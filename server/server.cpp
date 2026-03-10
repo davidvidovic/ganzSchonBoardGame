@@ -14,21 +14,31 @@ int main()
         return page;
     });
 
-    CROW_ROUTE(app,"/rollDice").methods("GET"_method)
+    CROW_ROUTE(app, "/roll")
     ([](){
-        game.rollDices();
-        game.sortDices();
-
-        crow::json::wvalue dices;
-        dices["blue"] = game.getDices().getDice(engine::GameColor::BLUE).getValue();
-        dices["yellow"] = game.getDices().getDice(engine::GameColor::YELLOW).getValue();
-        dices["orange"] = game.getDices().getDice(engine::GameColor::ORANGE).getValue();
-        dices["white"] = game.getDices().getDice(engine::GameColor::WHITE).getValue();
-        dices["green"] = game.getDices().getDice(engine::GameColor::GREEN).getValue();
-        dices["purple"] = game.getDices().getDice(engine::GameColor::PURPLE).getValue();
-
-        return dices;
+        auto page = crow::mustache::load_text("rollDices.html");
+        return page;
     });
+
+CROW_ROUTE(app, "/rollDice").methods("POST"_method)
+([](){
+    game.getDices().rollDices();
+    game.getDices().sortDices();
+
+    auto dices = game.getDices().getDices();
+
+    crow::json::wvalue result = crow::json::wvalue::list();
+
+    for (size_t i = 0; i < dices.size(); ++i) {
+        crow::json::wvalue obj;
+        obj["color"] = dices[i].gameColorToString(dices[i].getColor());
+        obj["value"] = dices[i].getValue();
+
+        result[i] = std::move(obj);
+    }
+
+    return result;
+});
 
     app.port(18080).multithreaded().run();
 }
