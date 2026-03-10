@@ -2,16 +2,14 @@
 
 namespace engine {
 
-Dices::Dices() {
-    dices = {
-        Dice(GameColor::WHITE),
-        Dice(GameColor::BLUE),
-        Dice(GameColor::YELLOW),
-        Dice(GameColor::GREEN), 
-        Dice(GameColor::PURPLE),
-        Dice(GameColor::ORANGE)
-    };
-}
+Dices::Dices() : dices{
+    Dice(GameColor::WHITE),
+    Dice(GameColor::BLUE),
+    Dice(GameColor::YELLOW),
+    Dice(GameColor::GREEN),
+    Dice(GameColor::PURPLE),
+    Dice(GameColor::ORANGE)
+} {}
 
 std::vector<Dice> Dices::getDices() {
     return dices;
@@ -30,12 +28,14 @@ void Dices::sortDices() {
     std::sort(dices.begin(), dices.end());
 }
 
-Dice Dices::getDice(int color) {
+Dice& Dices::getDice(int color) {
     for(auto& dice : dices) {
         if(dice.getColor() == color) {
             return dice;
         }
     }
+
+    throw std::runtime_error("Dice not found");
 }
 
 }

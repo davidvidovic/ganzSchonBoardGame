@@ -17,7 +17,7 @@ class GameEngine {
     public:
     void addPlayer(Player& player);
     void removePlayer(Player& player);
-    std::vector<Player> getPlayers();
+    const std::vector<Player>& getPlayers() const;
     Dices& getDices();
     void rollDices();
     void sortDices();

@@ -4,6 +4,8 @@
 #include <vector>
 #include <algorithm>
 #include <cstdlib>
+#include <stdexcept>
+
 #include "dice.h"
 #include "includes.h"
 
@@ -18,7 +20,7 @@ class Dices {
     void rollDices();
     void sortDices();
     std::vector<Dice> getDices();
-    Dice getDice(int color);
+    Dice& getDice(int color);
 };
 
 }

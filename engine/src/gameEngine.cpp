@@ -23,7 +23,7 @@ void GameEngine::removePlayer(Player& player) {
     }
 }
 
-std::vector<Player> GameEngine::getPlayers() {
+const std::vector<Player>& GameEngine::getPlayers() const {
     return players;
 }
 
