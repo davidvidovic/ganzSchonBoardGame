@@ -1,17 +1,24 @@
 /* This is the game engine. */
 
 #include "../include/gameEngine.h"
-#include <iostream>
 
 namespace engine
 {
 
 long long GameEngine::gameId = 0;
 
-void GameEngine::addPlayer(Player& player) {
+bool GameEngine::addPlayer(Player& player) {
     if(static_cast<int>(players.size()) < 4) {
         players.push_back(player);
+        return true;
     }
+
+    return false;
+}
+
+bool GameEngine::addPlayer(std::string_view player_name) {
+    Player p(player_name);
+    return addPlayer(p);
 }
 
 void GameEngine::removePlayer(Player& player) {

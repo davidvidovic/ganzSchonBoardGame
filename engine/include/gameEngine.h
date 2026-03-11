@@ -2,6 +2,7 @@
 #define ENGINE_H
 
 #include <vector>
+#include <string>
 #include "dices.h"
 #include "player.h"
 
@@ -15,7 +16,8 @@ class GameEngine {
     Dices dices;
 
     public:
-    void addPlayer(Player& player);
+    bool addPlayer(Player& player);
+    bool addPlayer(std::string_view player);
     void removePlayer(Player& player);
     const std::vector<Player>& getPlayers() const;
     Dices& getDices();

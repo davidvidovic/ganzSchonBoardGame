@@ -32,6 +32,12 @@ button {
     line-height: 90px;
     border-radius: 12px;
     font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.dice:hover {
+    transform: scale(1.1);
 }
 
 /* dice colors */
@@ -81,6 +87,13 @@ function diceToUnicode(value) {
     return map[value];
 }
 
+// Handle dice clicks
+function onDiceClick(color, value) {
+    console.log("Dice clicked:", color, value);
+    // TODO: Add your game logic here
+    alert(`You clicked the ${color} dice with value ${value}`);
+}
+
 async function rollDice() {
     const container = document.getElementById("diceContainer");
     container.innerHTML = ""; // clear old dice
@@ -93,6 +106,10 @@ async function rollDice() {
             const diceEl = document.createElement("div");
             diceEl.className = "dice " + dice.color; // set color
             diceEl.innerHTML = diceToUnicode(dice.value); // set value
+
+            // Make dice clickable
+            diceEl.onclick = () => onDiceClick(dice.color, dice.value);
+
             container.appendChild(diceEl);
         });
 

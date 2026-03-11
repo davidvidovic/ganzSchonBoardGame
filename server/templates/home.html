@@ -1,6 +1,99 @@
 <!DOCTYPE html>
-<html>
-  <body>
-  <p>Hello World!</p>
-  </body>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Welcome to Ganz Schön Clever</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 100px;
+    background-color: #808080;
+}
+
+.modal {
+    display: block;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 30px;
+    border-radius: 12px;
+    width: 300px;
+    text-align: center;
+}
+
+input[type="text"] {
+    width: 80%;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Welcome to Ganz Schön Clever!</h1>
+
+<!-- Modal -->
+<div class="modal" id="nameModal">
+    <div class="modal-content">
+        <h2>Enter your name:</h2>
+        <input type="text" id="playerName" placeholder="Your name">
+        <br>
+        <button onclick="submitName()">Start Game</button>
+    </div>
+</div>
+
+<script>
+async function submitName() {
+    const nameInput = document.getElementById("playerName");
+    const name = nameInput.value.trim();
+
+    if (!name) {
+        alert("Please enter a valid name!");
+        return;
+    }
+
+    try {
+        // Send name to Crow backend
+        const response = await fetch('/setName', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name })
+        });
+
+        if (response.ok) {
+            // Hide modal
+            document.getElementById("nameModal").style.display = "none";
+            // Redirect to roll page
+            window.location.href = "/roll";
+        } else {
+            alert("Failed to set name on server.");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Error contacting server.");
+    }
+}
+</script>
+
+</body>
 </html>
