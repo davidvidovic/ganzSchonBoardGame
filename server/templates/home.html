@@ -83,8 +83,8 @@ async function submitName() {
         if (response.ok) {
             // Hide modal
             document.getElementById("nameModal").style.display = "none";
-            // Redirect to roll page
-            window.location.href = "/roll";
+            // Redirect to board page
+            window.location.href = "/board";
         } else {
             alert("Failed to set name on server.");
         }
