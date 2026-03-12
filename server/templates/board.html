@@ -1,124 +1,693 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>Roll Dices</title>
+    <meta charset="UTF-8">
+    <title>Ganz Schön Clever</title>
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin-top: 50px;
-    background-color: #808080; /* grey background */
-}
+    <style>
+        body {
+            background: #222;
+            font-family: Arial, Helvetica, sans-serif;
+            color: white;
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
 
-button {
-    padding: 12px 30px;
-    font-size: 20px;
-    cursor: pointer;
-}
+        * {
+            box-sizing: border-box;
+        }
 
-#diceContainer {
-    margin-top: 40px;
-}
+        .board {
+            width: 1250px;
+        }
 
-/* base dice style */
-.dice {
-    display: inline-block;
-    font-size: 70px;
-    margin: 12px;
-    width: 90px;
-    height: 90px;
-    line-height: 90px;
-    border-radius: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.1s;
-}
+        .top-section {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
 
-.dice:hover {
-    transform: scale(1.1);
-}
+        .half-board {
+            flex: 1;
+        }
 
-/* dice colors */
-.blue {
-    background: #1e90ff;
-    color: white;
-}
+        .sidebar {
+            width: 220px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-.yellow {
-    background: #ffd700;
-    color: black;
-}
+        .sidebar-panel {
+            background: #444;
+            padding: 10px;
+            border-radius: 10px;
+        }
 
-.orange {
-    background: #ff8c00;
-    color: white;
-}
+        .round-row {
+            display: flex;
+            gap: 6px;
+        }
 
-.white {
-    background: white;
-    color: black;
-}
+        .round-box {
+            width: 40px;
+            height: 40px;
+            margin: 3px;
+            background: white;
+            color: black;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
 
-.green {
-    background: #2ecc71;
-    color: white;
-}
+        .circle-box {
+            width: 40px;
+            height: 40px;
+            margin: 3px;
+            background: white;
+            color: black;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-.purple {
-    background: #8e44ad;
-    color: white;
-}
-</style>
+        .circle-box:disabled {
+            background: #e1e0e0;
+            cursor: not-allowed;
+        }
+
+        .round-box.active-round {
+            background: #2e7d4d;
+            color: white;
+        }
+
+        .board-row {
+            margin: 12px 0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .square-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+
+        .grid {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .white-square {
+            width: 40px;
+            height: 40px;
+            margin: 3px;
+            background: white;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            color: black;
+        }
+
+        .white-square:disabled {
+            background: #bbb;
+            cursor: not-allowed;
+        }
+
+        .score-box {
+            width: 40px;
+            height: 40px;
+            margin: 3px;
+            background: #ffffff33;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .board-info {
+            width: 40px;
+            height: 40px;
+            margin: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+        }
+
+        .player-info {
+            width: 265px;
+            height: 40px;
+            margin: 3px;
+            display: flex;
+            align-items: left;
+            justify-content: left;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+        }
+
+        .arrow-square {
+            width: 10px;
+            height: 40px;
+            margin: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+        }
+
+        .arrow {
+            font-size: 18px;
+        }
+
+        /* bonus colors */
+        .bonus-blue {
+            background: #388bdf;
+        }
+
+        .bonus-yellow {
+            background: #fcc83a;
+            color: black;
+        }
+
+        .bonus-green {
+            background: #2e7d4d;
+        }
+
+        .bonus-orange {
+            background: #e6612d;
+        }
+
+        .bonus-purple {
+            background: #5e3b83;
+        }
+
+        .bonus-black {
+            background: #333;
+        }
+
+        .bonus-gray {
+            background: #646363;
+        }
+
+        .bonus-red {
+            background: #d63a3a;
+        }
+
+        .bonus-fox {
+            background: #d63a3a;
+        }
+
+        .bonus-empty {
+            background: transparent;
+        }
+
+        /* board colors */
+        .yellow {
+            background: #cfa83a;
+        }
+
+        .blue {
+            background: #2d5f92;
+        }
+
+        .green {
+            background: #2e7d4d;
+        }
+
+        .orange {
+            background: #a34b28;
+        }
+
+        .purple {
+            background: #5e3b83;
+        }
+
+        .white {
+            background: #ffffff;
+        }
+
+        .light-gray {
+            background: #848484;
+        }
+
+        /* dice */
+        .dice-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .dice {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: white;
+            color: black;
+            font-size: 30px;
+            border-radius: 10px;
+            margin: 5px;
+        }
+
+        .roll-button {
+            margin-top: 14px;
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .roll-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    </style>
 </head>
 
 <body>
 
-<h1>Ganz Schön Clever Dice Roller</h1>
+    <div class="board">
+        <!-- TOP SIDEBAR -->
+        <div class="sidebar">
+            <div class="top-section">
+                <div class="half-board">
 
-<button onclick="rollDice()">Roll</button>
+                    <div class="sidebar-panel">
+                        <div class="round-row">
+                            <div class="round-box active-round">1</div>
+                            <div class="round-box">2</div>
+                            <div class="round-box">3</div>
+                            <div class="round-box">4</div>
+                        </div>
+                        <div class="round-row" style="margin-top:8px;">
+                            <div class="board-info bonus-gray">⟳</div>
+                            <div class="board-info bonus-black">+1</div>
+                            <div class="board-info bonus-gray">⟳</div>
+                            <div class="board-info">X/6</div>
+                        </div>
+                    </div>
+                </div>
 
-<div id="diceContainer"></div>
+                <div class="half-board">
+                    <div class="sidebar-panel">
+                        <div class="round-row">
+                            <div class="board-info bonus-gray">⟳</div>
+                            <div class="circle-box"></div>
+                            <div class="circle-box"></div>
+                            <div class="circle-box"></div>
+                            <div class="circle-box"></div>
+                            <div class="circle-box"></div>
+                            <div class="circle-box"></div>
+                            <div class="circle-box"></div>
+                        </div>
+                        <div class="round-row" style="margin-top:8px;">
+                            <div class="board-info bonus-black">+1</div>
+                            <div class="circle-box"></div>
+                            <div class="circle-box"></div>
+                            <div class="circle-box"></div>
+                            <div class="circle-box"></div>
+                            <div class="circle-box"></div>
+                            <div class="circle-box"></div>
+                            <div class="circle-box"></div>
+                        </div>
+                    </div>
+                </div>
 
-<script>
-function diceToUnicode(value) {
-    const map = ["","⚀","⚁","⚂","⚃","⚄","⚅"];
-    return map[value];
-}
+                <div class="half-board">
+                    <div class="sidebar-panel">
+                        <div class="round-row">
+                            <div class="player-info light-gray">Player 1</div>
+                            <div class="player-info light-gray">Player 2</div>
+                        </div>
+                        <div class="round-row" style="margin-top:8px;">
+                            <div class="player-info light-gray">Player 3</div>
+                            <div class="player-info light-gray">Player 4</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-// Handle dice clicks
-function onDiceClick(color, value) {
-    console.log("Dice clicked:", color, value);
-    // TODO: Add your game logic here
-    alert(`You clicked the ${color} dice with value ${value}`);
-}
+        <div class="top-section">
 
-async function rollDice() {
-    const container = document.getElementById("diceContainer");
-    container.innerHTML = ""; // clear old dice
+            <!-- YELLOW BOARD -->
+            <div class="half-board">
+                <div class="board-row yellow">
+                    <div class="grid">
+                        <div class="square-row">
+                            <button class="white-square" data-board="yellow" data-index="0">1</button>
+                            <button class="white-square" data-board="yellow" data-index="1">X</button>
+                            <button class="white-square" data-board="yellow" data-index="2">4</button>
+                            <button class="white-square" data-board="yellow" data-index="3">3</button>
+                            <div class="board-info bonus-orange">1/4</div>
+                        </div>
 
-    try {
-        const response = await fetch('/rollDice', { method: 'POST' });
-        const data = await response.json();
+                        <div class="square-row">
+                            <button class="white-square" data-board="yellow" data-index="4">5</button>
+                            <button class="white-square" data-board="yellow" data-index="5">4</button>
+                            <button class="white-square" data-board="yellow" data-index="6">6</button>
+                            <button class="white-square" data-board="yellow" data-index="7">X</button>
+                            <div class="board-info bonus-yellow">20</div>
+                        </div>
 
-        data.forEach(dice => {
-            const diceEl = document.createElement("div");
-            diceEl.className = "dice " + dice.color; // set color
-            diceEl.innerHTML = diceToUnicode(dice.value); // set value
+                        <div class="square-row">
+                            <button class="white-square" data-board="yellow" data-index="8">X</button>
+                            <button class="white-square" data-board="yellow" data-index="9">5</button>
+                            <button class="white-square" data-board="yellow" data-index="10">2</button>
+                            <button class="white-square" data-board="yellow" data-index="11">1</button>
+                            <div class="board-info bonus-blue">X</div>
+                        </div>
 
-            // Make dice clickable
-            diceEl.onclick = () => onDiceClick(dice.color, dice.value);
+                        <div class="square-row">
+                            <button class="white-square" data-board="yellow" data-index="12">2</button>
+                            <button class="white-square" data-board="yellow" data-index="13">3</button>
+                            <button class="white-square" data-board="yellow" data-index="14">X</button>
+                            <button class="white-square" data-board="yellow" data-index="15">6</button>
+                            <div class="board-info bonus-yellow">16</div>
+                        </div>
 
-            container.appendChild(diceEl);
+                        <div class="square-row">
+                            <div class="board-info bonus-yellow">22</div>
+                            <div class="board-info bonus-yellow">12</div>
+                            <div class="board-info bonus-purple">6</div>
+                            <div class="board-info bonus-black">+1</div>
+                            <div class="board-info bonus-gray">⟳</div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- BLUE BOARD -->
+            <div class="half-board">
+                <div class="board-row blue">
+                    <div class="grid">
+
+                        <div class="square-row">
+                            <button class="white-square" data-board="blue" data-index="0">2</button>
+                            <button class="white-square" data-board="blue" data-index="1">5</button>
+                            <button class="white-square" data-board="blue" data-index="2">7</button>
+                            <button class="white-square" data-board="blue" data-index="3">10</button>
+                            <div class="board-info bonus-fox">🦊</div>
+                        </div>
+
+                        <div class="square-row">
+                            <button class="white-square" data-board="blue" data-index="4">3</button>
+                            <button class="white-square" data-board="blue" data-index="5">6</button>
+                            <button class="white-square" data-board="blue" data-index="6">8</button>
+                            <button class="white-square" data-board="blue" data-index="7">11</button>
+                            <div class="board-info bonus-green">X</div>
+                        </div>
+
+                        <div class="square-row">
+                            <button class="white-square" data-board="blue" data-index="8">4</button>
+                            <button class="white-square" data-board="blue" data-index="9">7</button>
+                            <button class="white-square" data-board="blue" data-index="10">9</button>
+                            <button class="white-square" data-board="blue" data-index="11">12</button>
+                            <div class="board-info bonus-purple">6</div>
+                        </div>
+
+                        <div class="square-row">
+                            <div class="board-info bonus-orange">1/6</div>
+                            <div class="board-info bonus-blue">X</div>
+                            <div class="board-info bonus-yellow">X</div>
+                            <div class="board-info bonus-black">+1</div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Dice -->
+            <div class="dice-container">
+                <div id="diceArea">
+                    <div class="dice" id="dice1">-</div>
+                    <div class="dice" id="dice2">-</div>
+                    <div class="dice" id="dice3">-</div>
+                    <div class="dice" id="dice4">-</div>
+                    <div class="dice" id="dice5">-</div>
+                    <div class="dice" id="dice6">-</div>
+                </div>
+
+                <button id="rollButton" class="roll-button">Roll Dice</button>
+            </div>
+
+
+        </div>
+        <!-- GREEN BOARD -->
+        <div class="board-row green">
+
+            <!-- score indicators -->
+            <div class="square-row">
+                <div class="score-box">1</div>
+                <div class="score-box">3</div>
+                <div class="score-box">6</div>
+                <div class="score-box">10</div>
+                <div class="score-box">15</div>
+                <div class="score-box">21</div>
+                <div class="score-box">28</div>
+                <div class="score-box">36</div>
+                <div class="score-box">45</div>
+                <div class="score-box">55</div>
+                <div class="score-box">66</div>
+            </div>
+
+            <!-- playable buttons -->
+            <div class="square-row">
+                <button class="white-square" data-board="green" data-index="0">≥2</button>
+                <button class="white-square" data-board="green" data-index="1">≥4</button>
+                <button class="white-square" data-board="green" data-index="2">≥3</button>
+                <button class="white-square" data-board="green" data-index="3">≥5</button>
+                <button class="white-square" data-board="green" data-index="4">≥1</button>
+                <button class="white-square" data-board="green" data-index="5">≥4</button>
+                <button class="white-square" data-board="green" data-index="6">≥2</button>
+                <button class="white-square" data-board="green" data-index="7">≥5</button>
+                <button class="white-square" data-board="green" data-index="8">≥1</button>
+                <button class="white-square" data-board="green" data-index="9">≥3</button>
+                <button class="white-square" data-board="green" data-index="10">≥6</button>
+            </div>
+
+            <!-- bonuses -->
+            <div class="square-row">
+                <div class="board-info bonus-empty"></div>
+                <div class="board-info bonus-empty"></div>
+                <div class="board-info bonus-gray">⟳</div>
+                <div class="board-info bonus-empty"></div>
+                <div class="board-info bonus-yellow">X</div>
+                <div class="board-info bonus-black">+1</div>
+                <div class="board-info bonus-empty"></div>
+                <div class="board-info bonus-blue">X</div>
+                <div class="board-info bonus-fox">🦊</div>
+                <div class="board-info bonus-empty"></div>
+                <div class="board-info bonus-empty"></div>
+            </div>
+
+        </div>
+
+        <!-- ORANGE BOARD -->
+        <div class="board-row orange">
+
+            <!-- multipliers -->
+            <div class="square-row">
+                <div class="board-info bonus-black">-1</div>
+                <div class="board-info bonus-empty"></div>
+                <div class="board-info bonus-orange">x2</div>
+                <div class="board-info bonus-orange">x3</div>
+                <div class="board-info bonus-black">-1</div>
+                <div class="board-info bonus-empty"></div>
+                <div class="board-info bonus-orange">x2</div>
+                <div class="board-info bonus-orange">x3</div>
+                <div class="board-info bonus-black">-1</div>
+                <div class="board-info bonus-empty"></div>
+                <div class="board-info bonus-orange">x4</div>
+            </div>
+
+            <!-- clickable input squares -->
+            <div class="square-row">
+                <button class="white-square" data-board="orange" data-index="0"></button>
+                <button class="white-square" data-board="orange" data-index="1"></button>
+                <button class="white-square" data-board="orange" data-index="2"></button>
+                <button class="white-square" data-board="orange" data-index="3"></button>
+                <button class="white-square" data-board="orange" data-index="4"></button>
+                <button class="white-square" data-board="orange" data-index="5"></button>
+                <button class="white-square" data-board="orange" data-index="6"></button>
+                <button class="white-square" data-board="orange" data-index="7"></button>
+                <button class="white-square" data-board="orange" data-index="8"></button>
+                <button class="white-square" data-board="orange" data-index="9"></button>
+                <button class="white-square" data-board="orange" data-index="10"></button>
+            </div>
+
+            <!-- bonuses -->
+            <div class="square-row">
+                <div class="board-info bonus-empty"></div>
+                <div class="board-info bonus-empty"></div>
+                <div class="board-info bonus-black">+1</div>
+                <div class="board-info bonus-empty"></div>
+                <div class="board-info bonus-purple">6</div>
+                <div class="board-info bonus-gray">⟳</div>
+                <div class="board-info bonus-fox">🦊</div>
+                <div class="board-info bonus-empty"></div>
+                <div class="board-info bonus-empty"></div>
+                <div class="board-info bonus-green">X</div>
+                <div class="board-info bonus-empty"></div>
+            </div>
+
+        </div>
+
+        <!-- PURPLE BOARD -->
+        <div class="board-row purple">
+
+            <div class="square-row">
+                <button class="white-square" data-board="purple" data-index="0"></button>
+                <div class="arrow-square arrow">&gt;</div>
+
+                <button class="white-square" data-board="purple" data-index="1"></button>
+                <div class="arrow-square arrow">&gt;</div>
+
+                <button class="white-square" data-board="purple" data-index="2"></button>
+                <div class="arrow-square arrow">&gt;</div>
+
+                <button class="white-square" data-board="purple" data-index="3"></button>
+                <div class="arrow-square arrow">&gt;</div>
+
+                <button class="white-square" data-board="purple" data-index="4"></button>
+                <div class="arrow-square arrow">&gt;</div>
+
+                <button class="white-square" data-board="purple" data-index="5"></button>
+                <div class="arrow-square arrow">&gt;</div>
+
+                <button class="white-square" data-board="purple" data-index="6"></button>
+                <div class="arrow-square arrow">&gt;</div>
+
+                <button class="white-square" data-board="purple" data-index="7"></button>
+                <div class="arrow-square arrow">&gt;</div>
+
+                <button class="white-square" data-board="purple" data-index="8"></button>
+                <div class="arrow-square arrow">&gt;</div>
+
+                <button class="white-square" data-board="purple" data-index="9"></button>
+                <div class="arrow-square arrow">&gt;</div>
+
+                <button class="white-square" data-board="purple" data-index="10"></button>
+            </div>
+
+            <!-- purple bonuses aligned with square positions -->
+            <div class="square-row">
+                <div class="board-info bonus-empty"></div>
+                <div class="arrow-square bonus-empty"></div>
+
+                <div class="board-info bonus-empty"></div>
+                <div class="arrow-square bonus-empty"></div>
+
+                <div class="board-info bonus-gray">⟳</div>
+                <div class="arrow-square bonus-empty"></div>
+
+                <div class="board-info bonus-green">X</div>
+                <div class="arrow-square bonus-empty"></div>
+
+                <div class="board-info bonus-orange">1/5</div>
+                <div class="arrow-square bonus-empty"></div>
+
+                <div class="board-info bonus-fox">🦊</div>
+                <div class="arrow-square"></div>
+
+                <div class="board-info bonus-black">+1</div>
+                <div class="arrow-square"></div>
+
+                <div class="board-info bonus-blue">X</div>
+                <div class="arrow-square"></div>
+
+                <div class="board-info bonus-gray">⟳</div>
+                <div class="arrow-square"></div>
+
+                <div class="board-info bonus-yellow">X</div>
+                <div class="arrow-square"></div>
+
+                <div class="board-info bonus-black">+1</div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll(".white-square").forEach(square => {
+            square.addEventListener("click", () => {
+                if (square.disabled) return;
+
+                const board = square.dataset.board;
+                const index = square.dataset.index;
+
+                playMove(board, index);
+            });
         });
 
-    } catch (err) {
-        container.innerText = "Error contacting server.";
-        console.error(err);
-    }
-}
-</script>
+        async function playMove(board, index) {
+            const response = await fetch("/playMove", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    board: board,
+                    index: index
+                })
+            });
+
+            const state = await response.json();
+            updateBoard(state);
+        }
+
+        document.getElementById("rollButton").onclick = async () => {
+            const response = await fetch("/rollDice", { method: "POST" });
+            const data = await response.json();
+            updateDice(data);
+        };
+
+        function updateDice(data) {
+            for (let i = 0; i < 6; i++) {
+                document.getElementById("dice" + (i + 1)).innerText = data.dices[i];
+            }
+        }
+
+        function updatePlayableSquares(playable) {
+            document.querySelectorAll(".white-square").forEach(s => {
+                s.disabled = true;
+            });
+
+            playable.forEach(p => {
+                const selector = `.white-square[data-board="${p.board}"][data-index="${p.index}"]`;
+                const el = document.querySelector(selector);
+                if (el) el.disabled = false;
+            });
+        }
+
+        function updateBoard(state) {
+            updatePlayableSquares(state.playableSquares);
+        }
+
+        function setRollEnabled(enabled) {
+            document.getElementById("rollButton").disabled = !enabled;
+        }
+    </script>
 
 </body>
+
 </html>
