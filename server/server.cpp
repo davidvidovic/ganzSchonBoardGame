@@ -87,10 +87,6 @@ int main()
     ([&](const crow::request& req){
         std::string sessionId = getSessionId(req);
 
-        for(auto& s : sessions) {
-            std::cout << s.first << '\n';
-        }
-
         if(sessions.find(sessionId) == sessions.end())
             return crow::response(403);
 
@@ -100,7 +96,6 @@ int main()
 
     CROW_ROUTE(app, "/rollDice").methods("POST"_method)
     ([&](const crow::request& req){
-
         std::string sessionId = getSessionId(req);
 
         if(sessions.find(sessionId) == sessions.end())

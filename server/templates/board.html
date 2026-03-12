@@ -260,11 +260,35 @@
             justify-content: center;
             width: 60px;
             height: 60px;
-            background: white;
-            color: black;
             font-size: 30px;
             border-radius: 10px;
             margin: 5px;
+        }
+
+        .dice.white {
+            background: white;
+            color: black;
+        }
+
+        .dice.blue {
+            background: #2d5f92;
+        }
+
+        .dice.yellow {
+            background: #fcc83a;
+            color: black;
+        }
+
+        .dice.green {
+            background: #2e7d4d;
+        }
+
+        .dice.orange {
+            background: #e6612d;
+        }
+
+        .dice.purple {
+            background: #5e3b83;
         }
 
         .roll-button {
@@ -630,6 +654,11 @@
     </div>
 
     <script>
+        function diceToUnicode(value) {
+            const map = ["", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+            return map[value];
+        }
+
         document.querySelectorAll(".white-square").forEach(square => {
             square.addEventListener("click", () => {
                 if (square.disabled) return;
@@ -663,7 +692,12 @@
 
         function updateDice(data) {
             for (let i = 0; i < 6; i++) {
-                document.getElementById("dice" + (i + 1)).innerText = data.dices[i];
+                const el = document.getElementById("dice" + (i + 1));
+
+                el.innerText = diceToUnicode(data[i].value);
+
+                el.classList.remove("white", "blue", "yellow", "green", "orange", "purple");
+                el.classList.add(data[i].color);
             }
         }
 
