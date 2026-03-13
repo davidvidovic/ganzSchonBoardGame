@@ -359,12 +359,12 @@
                 <div class="half-board">
                     <div class="sidebar-panel">
                         <div class="round-row">
-                            <div class="player-info light-gray">Player 1</div>
-                            <div class="player-info light-gray">Player 2</div>
+                            <div class="player-info light-gray" id="player1">Player 1</div>
+                            <div class="player-info light-gray" id="player2">Player 2</div>
                         </div>
                         <div class="round-row" style="margin-top:8px;">
-                            <div class="player-info light-gray">Player 3</div>
-                            <div class="player-info light-gray">Player 4</div>
+                            <div class="player-info light-gray" id="player3">Player 3</div>
+                            <div class="player-info light-gray" id="player4">Player 4</div>
                         </div>
                     </div>
                 </div>
@@ -659,6 +659,44 @@
             return map[value];
         }
 
+        let socket = null;
+
+        function connectWebSocket() {
+            const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+            socket = new WebSocket(protocol + window.location.host + "/ws");
+
+            socket.onopen = () => {
+                console.log("WebSocket connected");
+                playerJoined();
+            };
+
+            socket.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+
+                if (msg.type === "diceRolled") {
+                    updateDice(msg.dice);
+                }
+
+                if (msg.type === "boardUpdated") {
+                    updateBoard(msg.state);
+                }
+
+                if (msg.type === "playerJoined") {
+                    updatePlayers(msg.players);
+                }
+            };
+
+            socket.onclose = () => {
+                console.log("WebSocket disconnected");
+            };
+
+            socket.onerror = (err) => {
+                console.error("WebSocket error:", err);
+            };
+        }
+
+        connectWebSocket();
+
         document.querySelectorAll(".white-square").forEach(square => {
             square.addEventListener("click", () => {
                 if (square.disabled) return;
@@ -684,10 +722,20 @@
             updateBoard(state);
         }
 
+        async function playerJoined(board, index) {
+            const response = await fetch("/playerJoined", { method: "POST" });
+
+            if (!response.ok) {
+                alert("Failed to roll dice.");
+            }
+        }
+
         document.getElementById("rollButton").onclick = async () => {
             const response = await fetch("/rollDice", { method: "POST" });
-            const data = await response.json();
-            updateDice(data);
+
+            if (!response.ok) {
+                alert("Failed to roll dice.");
+            }
         };
 
         function updateDice(data) {
@@ -698,6 +746,13 @@
 
                 el.classList.remove("white", "blue", "yellow", "green", "orange", "purple");
                 el.classList.add(data[i].color);
+            }
+        }
+
+        function updatePlayers(data) {
+            for (let i = 0; i < 4; i++) {
+                const el = document.getElementById("player" + (i + 1));
+                el.innerText = data[i].name;
             }
         }
 

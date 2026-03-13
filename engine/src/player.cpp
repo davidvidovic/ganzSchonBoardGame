@@ -15,7 +15,7 @@ void Player::setName(std::string_view name) {
     name = name;
 }
 
-std::string_view Player::getName() {
+std::string_view Player::getName() const {
     return name;
 }
 

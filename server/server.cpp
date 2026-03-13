@@ -2,9 +2,15 @@
 #include "../engine/include/gameEngine.h"
 #include <unordered_map>
 #include <random>
+#include <mutex>
+#include <algorithm>
+#include <vector>
 
 engine::GameEngine game;
 std::unordered_map<std::string, const engine::Player*> sessions;
+std::vector<crow::websocket::connection*> connections;
+std::mutex connectionsMutex;
+std::mutex sessionsMutex;
 
 std::string generateSessionId()
 {
@@ -51,6 +57,19 @@ int main()
     crow::SimpleApp app;
     crow::mustache::set_global_base("server/templates");
 
+    CROW_WEBSOCKET_ROUTE(app, "/ws")
+    .onopen([&](crow::websocket::connection& conn){
+        std::lock_guard<std::mutex> lock(connectionsMutex);
+        connections.push_back(&conn);
+    })
+    .onclose([&](crow::websocket::connection& conn, const std::string&, uint16_t){
+        std::lock_guard<std::mutex> lock(connectionsMutex);
+        connections.erase(
+            std::remove(connections.begin(), connections.end(), &conn),
+            connections.end()
+        );
+    });
+    
     CROW_ROUTE(app, "/")([](){
         auto page = crow::mustache::load_text("home.html");
         return page;
@@ -75,7 +94,10 @@ int main()
         const engine::Player* player = &players.back();
 
         std::string sessionId = generateSessionId();
-        sessions[sessionId] = player;
+        {
+            std::lock_guard<std::mutex> lock(sessionsMutex);
+            sessions[sessionId] = player;
+        }
 
         crow::response res(200);
         res.add_header("Set-Cookie", "session_id=" + sessionId + "; Path=/");
@@ -83,12 +105,50 @@ int main()
         return res;
     });
 
+    CROW_ROUTE(app, "/playerJoined").methods("POST"_method)
+    ([](const crow::request& req){
+        std::string sessionId = getSessionId(req);
+        {
+            std::lock_guard<std::mutex> lock(sessionsMutex);
+            if (sessions.find(sessionId) == sessions.end())
+                return crow::response(403);
+        }
+
+        auto& players = game.getPlayers();
+        crow::json::wvalue namesList = crow::json::wvalue::list();
+        size_t i = 0;
+        for (auto& p : players) {
+            crow::json::wvalue obj;
+            obj["name"] = std::string(p.getName());
+            namesList[i++] = std::move(obj);
+        }
+
+        crow::json::wvalue message;
+        message["type"] = "playerJoined";
+        message["players"] = std::move(namesList);
+
+        std::string msg = message.dump();
+
+        {
+            std::lock_guard<std::mutex> lock(connectionsMutex);
+            for (auto* c : connections)
+                c->send_text(msg);
+        }
+
+        std::cout << msg << std::endl;
+
+        return crow::response(200);
+    });
+
     CROW_ROUTE(app, "/board")
     ([&](const crow::request& req){
         std::string sessionId = getSessionId(req);
 
-        if(sessions.find(sessionId) == sessions.end())
-            return crow::response(403);
+        {
+            std::lock_guard<std::mutex> lock(sessionsMutex);
+            if (sessions.find(sessionId) == sessions.end())
+                return crow::response(403);
+        }
 
         auto page = crow::mustache::load_text("board.html");
         return crow::response(page);
@@ -96,27 +156,41 @@ int main()
 
     CROW_ROUTE(app, "/rollDice").methods("POST"_method)
     ([&](const crow::request& req){
-        std::string sessionId = getSessionId(req);
 
-        if(sessions.find(sessionId) == sessions.end())
-            return crow::response(403);
+        std::string sessionId = getSessionId(req);
+        {
+            std::lock_guard<std::mutex> lock(sessionsMutex);
+            if (sessions.find(sessionId) == sessions.end())
+                return crow::response(403);
+        }
 
         game.getDices().rollDices();
         game.getDices().sortDices();
 
         auto dices = game.getDices().getDices();
 
-        crow::json::wvalue result = crow::json::wvalue::list();
+        crow::json::wvalue diceList = crow::json::wvalue::list();
 
         for (size_t i = 0; i < dices.size(); ++i) {
             crow::json::wvalue obj;
             obj["color"] = dices[i].gameColorToString(dices[i].getColor());
             obj["value"] = dices[i].getValue();
-
-            result[i] = std::move(obj);
+            diceList[i] = std::move(obj);
         }
 
-        return crow::response(result);
+        crow::json::wvalue message;
+        message["type"] = "diceRolled";
+        message["dice"] = std::move(diceList);
+
+        std::string msg = message.dump();
+
+        {
+            std::lock_guard<std::mutex> lock(connectionsMutex);
+            for (auto* c : connections)
+                c->send_text(msg);
+        }
+
+        return crow::response(200);
     });
     
 
