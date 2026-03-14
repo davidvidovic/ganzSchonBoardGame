@@ -7,7 +7,7 @@
 #include <vector>
 
 engine::GameEngine game;
-std::unordered_map<std::string, const engine::Player*> sessions;
+std::unordered_map<std::string, int> sessions;
 std::vector<crow::websocket::connection*> connections;
 std::mutex connectionsMutex;
 std::mutex sessionsMutex;
@@ -90,13 +90,13 @@ int main()
         if(!playerAdded)
             return crow::response(500);
 
-        auto& players = game.getPlayers();
-        const engine::Player* player = &players.back();
+        auto players = game.getPlayers();
+        int playerId = players.back().getId();
 
         std::string sessionId = generateSessionId();
         {
             std::lock_guard<std::mutex> lock(sessionsMutex);
-            sessions[sessionId] = player;
+            sessions[sessionId] = playerId;
         }
 
         crow::response res(200);
@@ -125,7 +125,15 @@ int main()
 
         crow::json::wvalue message;
         message["type"] = "playerJoined";
+        message["numberOfPlayers"] = players.size();
         message["players"] = std::move(namesList);
+        if(players.size() == 4) {
+            message["startGame"] = "true";
+            game.startGame();
+        }
+        else {
+            message["startGame"] = "false";
+        }
 
         std::string msg = message.dump();
 
@@ -135,7 +143,20 @@ int main()
                 c->send_text(msg);
         }
 
-        std::cout << msg << std::endl;
+        return crow::response(200);
+    });
+
+    CROW_ROUTE(app, "/playerLeft").methods("POST"_method)
+    ([](const crow::request& req){
+        std::string sessionId = getSessionId(req);
+        {
+            std::lock_guard<std::mutex> lock(sessionsMutex);
+            if (sessions.find(sessionId) == sessions.end())
+                return crow::response(403);
+        }
+        std::cout << req.raw_url << std::endl;
+
+        // I think the game should end here
 
         return crow::response(200);
     });
@@ -189,6 +210,45 @@ int main()
             for (auto* c : connections)
                 c->send_text(msg);
         }
+
+        return crow::response(200);
+    });
+
+
+    CROW_ROUTE(app, "/updateBoard").methods("POST"_method)
+    ([&](const crow::request& req){
+
+        std::string sessionId = getSessionId(req);
+
+        int playerId;
+        {
+            std::lock_guard<std::mutex> lock(sessionsMutex);
+            auto it = sessions.find(sessionId);
+            if (it == sessions.end())
+                return crow::response(403);
+
+            playerId = it->second;
+        }
+
+        engine::Player* player = game.findPlayerById(playerId);
+        if (!player)
+            return crow::response(404);
+
+        crow::json::wvalue message;
+        message["type"] = "updateBoard";
+        message["state"] = player->getBoardAsJSON();
+
+        std::string msg = message.dump();
+
+        {
+            std::lock_guard<std::mutex> lock(connectionsMutex);
+            for (auto* c : connections) {
+                if (c)
+                    c->send_text(msg);
+            }
+        }
+
+        std::cout << "All done" << std::endl;
 
         return crow::response(200);
     });

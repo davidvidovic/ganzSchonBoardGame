@@ -8,6 +8,8 @@
 #include "blueBoard.h"
 #include "orangeBoard.h"
 #include "purpleBoard.h"
+#include "includes.h"
+#include "crow.h"
 
 namespace engine {
 
@@ -24,7 +26,7 @@ class Player {
     BlueBoard blueBoard;
     OrangeBoard orangeBoard;
     PurpleBoard purpleBoard;
-    // Bonuses: plus ones, re-rolls
+    std::vector<GameBonus::GameBonus> bonuses;
 
     public:
     Player();
@@ -32,6 +34,12 @@ class Player {
     void setName(std::string_view name);
     std::string_view getName() const;
     int getId();
+    void setIsTurn(bool newTurn);
+    bool getIsTurn();
+    void setBonuses(GameBonus::GameBonus bonus);
+    std::vector<GameBonus::GameBonus> getBonuses();
+    crow::json::wvalue getBoardAsJSON();
+
     friend bool operator== (const Player& p1, const Player& p2);
     friend std::ostream& operator<<(std::ostream& os, const Player& p);
 };

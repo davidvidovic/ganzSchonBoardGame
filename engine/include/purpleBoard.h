@@ -40,6 +40,10 @@ class PurpleBoard : NumericBoard {
         board_values[currentIndex] = diceValue;
         currentIndex++;
     }
+
+    std::vector<int> getBoardValues() {
+        return board_values;
+    }
 };
 
 

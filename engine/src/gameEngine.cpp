@@ -46,4 +46,23 @@ void GameEngine::sortDices() {
     dices.sortDices();
 }
 
+void GameEngine::startGame() {
+    players[0].setIsTurn(true);
+}
+
+void GameEngine::assignRoundBonus() {
+    for(auto& p : players) {
+        p.setBonuses(roundBonus[round]);
+    }
+}
+
+Player* GameEngine::findPlayerById(int playerId)
+{
+    for (auto& p : players) {
+        if (p.getId() == playerId)
+            return &p;
+    }
+    return nullptr;
+}
+
 }

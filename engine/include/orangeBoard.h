@@ -37,6 +37,10 @@ class OrangeBoard : NumericBoard {
         board_values[currentIndex] = new_value;
         currentIndex++;
     }
+
+    std::vector<int> getBoardValues() {
+        return board_values;
+    }
 };
 
 

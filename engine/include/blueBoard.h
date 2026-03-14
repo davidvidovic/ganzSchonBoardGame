@@ -56,6 +56,10 @@ class BlueBoard : BooleanBoard {
         board_state[coordinate] = true;
         // Bonuses
     }
+
+    std::vector<bool> getBoardState() {
+        return board_state;
+    }
 };
 
 }

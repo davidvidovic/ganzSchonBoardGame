@@ -177,6 +177,22 @@
             font-size: 18px;
         }
 
+        #statusBar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+
+            background: #333;
+            color: white;
+
+            padding: 10px;
+            text-align: center;
+
+            font-size: 16px;
+            border-top: 2px solid #555;
+        }
+
         /* bonus colors */
         .bonus-blue {
             background: #388bdf;
@@ -656,6 +672,10 @@
             </div>
 
         </div>
+
+        <div id="statusBar">
+            Waiting for players...
+        </div>
     </div>
 
     <script>
@@ -673,6 +693,10 @@
             socket.onopen = () => {
                 console.log("WebSocket connected");
                 playerJoined();
+
+                document.querySelectorAll(".white-square").forEach(s => {
+                    s.disabled = true;
+                });
             };
 
             socket.onmessage = (event) => {
@@ -682,17 +706,21 @@
                     updateDice(msg.dice);
                 }
 
-                if (msg.type === "boardUpdated") {
+                if (msg.type === "updateBoard") {
                     updateBoard(msg.state);
                 }
 
                 if (msg.type === "playerJoined") {
-                    updatePlayers(msg.players);
+                    updatePlayers(msg);
+                    if (msg.startGame == "true") {
+                        startGame();
+                    }
                 }
             };
 
             socket.onclose = () => {
                 console.log("WebSocket disconnected");
+                playerLeft();
             };
 
             socket.onerror = (err) => {
@@ -727,11 +755,19 @@
             updateBoard(state);
         }
 
-        async function playerJoined(board, index) {
+        async function playerJoined() {
             const response = await fetch("/playerJoined", { method: "POST" });
 
             if (!response.ok) {
-                alert("Failed to roll dice.");
+                alert("Failed to join the player.");
+            }
+        }
+
+        async function playerLeft() {
+            const response = await fetch("/playerLeft", { method: "POST" });
+
+            if (!response.ok) {
+                alert("Failed to delete a disconnected player.");
             }
         }
 
@@ -755,9 +791,30 @@
         }
 
         function updatePlayers(data) {
-            for (let i = 0; i < 4; i++) {
+            const numberOfPlayers = data.numberOfPlayers;
+            for (let i = 0; i < numberOfPlayers; i++) {
                 const el = document.getElementById("player" + (i + 1));
-                el.innerText = data[i].name;
+                el.innerText = data.players[i].name;
+            }
+
+            if (numberOfPlayers < 4) {
+                updateStatus("Waiting for " + (4 - numberOfPlayers) + " more players...");
+            }
+            else {
+                updateStatus("Starting the game.")
+            }
+        }
+
+        function updateStatus(message) {
+            const status = document.getElementById("statusBar");
+            status.innerText = message;
+        }
+
+        async function startGame() {
+            const response = await fetch("/updateBoard", { method: "POST" });
+
+            if (!response.ok) {
+                alert("Failed to start the game.");
             }
         }
 
@@ -774,7 +831,24 @@
         }
 
         function updateBoard(state) {
-            updatePlayableSquares(state.playableSquares);
+            
+
+            const elements = document.querySelectorAll('.white-square[data-board="yellow"]');
+            console.log(elements)
+            elements.forEach(element => {
+                const index = parseInt(element.dataset.index);
+                console.log(index + " " + state.yellowBoard[index])
+
+                if (state.yellowBoard[index] === "T") {
+                    element.classList.add("disabled");
+                    element.style.pointerEvents = "none";
+                    element.style.opacity = "0.5";
+                } else {
+                    element.classList.remove("disabled");
+                    element.style.pointerEvents = "auto";
+                    element.style.opacity = "1";
+                }
+            });
         }
 
         function setRollEnabled(enabled) {

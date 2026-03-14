@@ -5,6 +5,7 @@
 #include <string>
 #include "dices.h"
 #include "player.h"
+#include "includes.h"
 
 namespace engine
 {
@@ -14,6 +15,8 @@ class GameEngine {
     static long long gameId;
     std::vector<Player> players;
     Dices dices;
+    int round{0};
+    std::vector<GameBonus::GameBonus> roundBonus{GameBonus::REROLL, GameBonus::PLUS_ONE, GameBonus::REROLL, GameBonus::UNIVERSAL_X_OR_6};
 
     public:
     bool addPlayer(Player& player);
@@ -23,6 +26,9 @@ class GameEngine {
     Dices& getDices();
     void rollDices();
     void sortDices();
+    void startGame();
+    void assignRoundBonus();
+    Player* findPlayerById(int playerId);
 };
 
 }

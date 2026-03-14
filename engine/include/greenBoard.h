@@ -39,6 +39,10 @@ class GreenBoard : BooleanBoard {
         board_state[currentIndex] = true;
         currentIndex++;
     }
+
+    std::vector<bool> getBoardState() {
+        return board_state;
+    }
 };
 
 

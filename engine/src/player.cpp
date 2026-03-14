@@ -23,6 +23,32 @@ int Player::getId() {
     return id;
 }
 
+void Player::setIsTurn(bool newTurn) {
+    isTurn = newTurn;
+}
+
+bool Player::getIsTurn() {
+    return isTurn;
+}
+
+void Player::setBonuses(GameBonus::GameBonus bonus) {
+    bonuses.push_back(bonus);
+}
+
+std::vector<GameBonus::GameBonus> Player::getBonuses() {
+    return bonuses;
+}
+
+crow::json::wvalue Player::getBoardAsJSON() {
+    crow::json::wvalue message;
+
+    std::string yellowBoardAsString = yellowBoard.getBoardAsString();
+      
+    message["yellowBoard"] = std::move(yellowBoardAsString);
+    
+    return message ;
+}
+
 bool operator== (const Player& p1, const Player& p2)
 {
     return p1.id == p2.id;
