@@ -34,6 +34,7 @@ class NumericBoard : public Board {
     protected:
     std::vector<int> board_multipliers;
     std::vector<int> board_values;
+    std::vector<bool> board_state; 
     virtual std::vector<int> getBoardValues() = 0;
 };
 

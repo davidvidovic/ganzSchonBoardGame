@@ -247,9 +247,7 @@ int main()
                     c->send_text(msg);
             }
         }
-
-        std::cout << "All done" << std::endl;
-
+        
         return crow::response(200);
     });
     

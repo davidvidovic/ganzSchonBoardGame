@@ -60,6 +60,20 @@ class BlueBoard : BooleanBoard {
     std::vector<bool> getBoardState() {
         return board_state;
     }
+
+    std::string getBoardAsString() {
+        std::string board;
+        for(const auto& v : board_state) {
+            if(v) {
+                board.append("T");
+            }
+            else {
+                board.append("F");
+            }
+        }
+
+        return board;
+    }
 };
 
 }

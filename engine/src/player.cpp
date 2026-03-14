@@ -43,8 +43,16 @@ crow::json::wvalue Player::getBoardAsJSON() {
     crow::json::wvalue message;
 
     std::string yellowBoardAsString = yellowBoard.getBoardAsString();
-      
+    std::string blueBoardAsString = blueBoard.getBoardAsString();
+    std::string greenBoardAsString = greenBoard.getBoardAsString();
+    std::string orangeBoardAsString = orangeBoard.getBoardAsString();
+    std::string purpleBoardAsString = purpleBoard.getBoardAsString();
+
     message["yellowBoard"] = std::move(yellowBoardAsString);
+    message["blueBoard"] = std::move(blueBoardAsString);
+    message["greenBoard"] = std::move(greenBoardAsString);
+    message["orangeBoard"] = std::move(orangeBoardAsString);
+    message["purpleBoard"] = std::move(purpleBoardAsString);
     
     return message ;
 }

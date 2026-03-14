@@ -10,6 +10,7 @@ class PurpleBoard : NumericBoard {
     PurpleBoard() : NumericBoard() {
         board_values = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         board_multipliers = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+        board_state = {false, false, false, false, false, false, false, false, false, false, false};
         board_bonus_map = {
             GameBonus::NONE, 
             GameBonus::NONE, 
@@ -38,11 +39,26 @@ class PurpleBoard : NumericBoard {
     void play(int diceValue) override {
         score += diceValue;
         board_values[currentIndex] = diceValue;
+        board_state[currentIndex] = true;
         currentIndex++;
     }
 
     std::vector<int> getBoardValues() {
         return board_values;
+    }
+
+    std::string getBoardAsString() {
+        std::string board;
+        for(const auto& v : board_state) {
+            if(v) {
+                board.append(std::to_string(board_values[currentIndex]));
+            }
+            else {
+                board.append("F");
+            }
+        }
+
+        return board;
     }
 };
 

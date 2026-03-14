@@ -831,22 +831,90 @@
         }
 
         function updateBoard(state) {
-            
-
-            const elements = document.querySelectorAll('.white-square[data-board="yellow"]');
-            console.log(elements)
-            elements.forEach(element => {
+            const yellowElements = document.querySelectorAll('.white-square[data-board="yellow"]');
+            yellowElements.forEach(element => {
                 const index = parseInt(element.dataset.index);
-                console.log(index + " " + state.yellowBoard[index])
 
                 if (state.yellowBoard[index] === "T") {
                     element.classList.add("disabled");
                     element.style.pointerEvents = "none";
                     element.style.opacity = "0.5";
+                    element.disabled = true;
                 } else {
                     element.classList.remove("disabled");
                     element.style.pointerEvents = "auto";
                     element.style.opacity = "1";
+                    element.disabled = false;
+                }
+            });
+
+            const blueElements = document.querySelectorAll('.white-square[data-board="blue"]');
+            blueElements.forEach(element => {
+                const index = parseInt(element.dataset.index);
+
+                if (state.blueBoard[index] === "T") {
+                    element.classList.add("disabled");
+                    element.style.pointerEvents = "none";
+                    element.style.opacity = "0.5";
+                    element.disabled = true;
+                } else {
+                    element.classList.remove("disabled");
+                    element.style.pointerEvents = "auto";
+                    element.style.opacity = "1";
+                    element.disabled = false;
+                }
+            });
+
+            const greenElements = document.querySelectorAll('.white-square[data-board="green"]');
+            greenElements.forEach(element => {
+                const index = parseInt(element.dataset.index);
+
+                if (state.greenBoard[index] === "T") {
+                    element.classList.add("disabled");
+                    element.style.pointerEvents = "none";
+                    element.style.opacity = "0.5";
+                    element.disabled = true;
+                } else {
+                    element.classList.remove("disabled");
+                    element.style.pointerEvents = "auto";
+                    element.style.opacity = "1";
+                    element.disabled = false;
+                }
+            });
+
+            const orangeElements = document.querySelectorAll('.white-square[data-board="orange"]');
+            orangeElements.forEach(element => {
+                const index = parseInt(element.dataset.index);
+
+                if (state.orangeBoard[index] === "F") {
+                    element.classList.remove("disabled");
+                    element.style.pointerEvents = "auto";
+                    element.style.opacity = "1";
+                    element.disabled = false;
+                } else {
+                    element.classList.add("disabled");
+                    element.style.pointerEvents = "none";
+                    element.style.opacity = "0.5";
+                    element.innerText = state.orangeBoard[index];
+                    element.disabled = true;
+                }
+            });
+
+            const purpleElements = document.querySelectorAll('.white-square[data-board="purple"]');
+            purpleElements.forEach(element => {
+                const index = parseInt(element.dataset.index);
+
+                if (state.purpleBoard[index] === "F") {
+                    element.classList.remove("disabled");
+                    element.style.pointerEvents = "auto";
+                    element.style.opacity = "1";
+                    element.disabled = false;
+                } else {
+                    element.classList.add("disabled");
+                    element.style.pointerEvents = "none";
+                    element.style.opacity = "0.5";
+                    element.innerText = state.purpleBoard[index];
+                    element.disabled = true;
                 }
             });
         }
