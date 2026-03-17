@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <unordered_map>
 #include "greenBoard.h"
 #include "yellowBoard.h"
 #include "blueBoard.h"
@@ -39,6 +40,7 @@ class Player {
     void setBonuses(GameBonus::GameBonus bonus);
     std::vector<GameBonus::GameBonus> getBonuses();
     crow::json::wvalue getBoardAsJSON();
+    crow::json::wvalue getPlayebleFieldsAsJSON(std::unordered_map<GameColor::GameColor, int> dices);
 
     friend bool operator== (const Player& p1, const Player& p2);
     friend std::ostream& operator<<(std::ostream& os, const Player& p);

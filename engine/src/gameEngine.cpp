@@ -38,6 +38,16 @@ Dices& GameEngine::getDices() {
     return dices;
 }
 
+std::unordered_map<GameColor::GameColor, int> GameEngine::getDiceValues() {
+    std::unordered_map<GameColor::GameColor, int> values;
+    auto allDices = dices.getDices();
+    for(auto& d : allDices) {
+        values[d.getColor()] = d.getValue();
+    }
+
+    return values;
+}
+
 void GameEngine::rollDices() {
     dices.rollDices();
 }

@@ -29,7 +29,7 @@ class OrangeBoard : NumericBoard {
     std::vector<int> isPlayable([[maybe_unused]] int diceValue) override {
         if(currentIndex >= ORANGE_BOARD_LENGTH) return {};
 
-        return {currentIndex+1};
+        return {currentIndex};
     }
     
     void play([[maybe_unused]] int diceValue) override {

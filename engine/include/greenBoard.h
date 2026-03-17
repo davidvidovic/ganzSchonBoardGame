@@ -29,7 +29,7 @@ class GreenBoard : BooleanBoard {
         if(currentIndex >= GREEN_BOARD_LENGTH) return {};
 
         if(diceValue >= board_box_requirements[currentIndex])
-            return {currentIndex+1};
+            return {currentIndex};
         else
             return {};
     }

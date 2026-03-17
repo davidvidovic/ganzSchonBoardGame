@@ -185,6 +185,18 @@ int main()
                 return crow::response(403);
         }
 
+        int playerId;
+        {
+            std::lock_guard<std::mutex> lock(sessionsMutex);
+            auto it = sessions.find(sessionId);
+            if (it == sessions.end())
+                return crow::response(403);
+
+            playerId = it->second;
+        }
+
+        engine::Player* player = game.findPlayerById(playerId);
+
         game.getDices().rollDices();
         game.getDices().sortDices();
 
@@ -196,12 +208,17 @@ int main()
             crow::json::wvalue obj;
             obj["color"] = dices[i].gameColorToString(dices[i].getColor());
             obj["value"] = dices[i].getValue();
+            obj["isLocked"] = dices[i].getLocked();
             diceList[i] = std::move(obj);
         }
 
         crow::json::wvalue message;
         message["type"] = "diceRolled";
         message["dice"] = std::move(diceList);
+
+
+        // Update playable fields for this player
+        message["playebleFields"] = player->getPlayebleFieldsAsJSON(game.getDiceValues());
 
         std::string msg = message.dump();
 
@@ -217,8 +234,13 @@ int main()
 
     CROW_ROUTE(app, "/updateBoard").methods("POST"_method)
     ([&](const crow::request& req){
-
         std::string sessionId = getSessionId(req);
+
+        {
+            std::lock_guard<std::mutex> lock(sessionsMutex);
+            if (sessions.find(sessionId) == sessions.end())
+                return crow::response(403);
+        }
 
         int playerId;
         {
@@ -247,10 +269,43 @@ int main()
                     c->send_text(msg);
             }
         }
-        
+
         return crow::response(200);
     });
     
+
+    CROW_ROUTE(app, "/dicePlayed").methods("POST"_method)
+    ([](const crow::request& req){
+        std::string sessionId = getSessionId(req);
+
+        {
+            std::lock_guard<std::mutex> lock(sessionsMutex);
+            if (sessions.find(sessionId) == sessions.end())
+                return crow::response(403);
+        }
+
+        int playerId;
+        {
+            std::lock_guard<std::mutex> lock(sessionsMutex);
+            auto it = sessions.find(sessionId);
+            if (it == sessions.end())
+                return crow::response(403);
+
+            playerId = it->second;
+        }
+
+        engine::Player* player = game.findPlayerById(playerId);
+
+        auto body = crow::json::load(req.body);
+        if (!body)
+            return crow::response(400);
+
+        std::string dice = body["dice"].s();
+
+        std::cout << "Dice played: " << dice << std::endl;
+
+        return crow::response(200);
+    });
 
     app.port(18080).multithreaded().run();
 }

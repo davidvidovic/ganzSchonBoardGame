@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <unordered_map>
 #include "dices.h"
 #include "player.h"
 #include "includes.h"
@@ -24,6 +25,7 @@ class GameEngine {
     void removePlayer(Player& player);
     const std::vector<Player>& getPlayers() const;
     Dices& getDices();
+    std::unordered_map<GameColor::GameColor, int> getDiceValues();
     void rollDices();
     void sortDices();
     void startGame();

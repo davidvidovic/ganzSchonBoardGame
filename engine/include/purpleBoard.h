@@ -31,7 +31,7 @@ class PurpleBoard : NumericBoard {
         if(currentIndex < 1) return {currentIndex};
 
         if(diceValue > board_values[currentIndex-1])
-            return {currentIndex+1};
+            return {currentIndex};
         else
             return {};
     }

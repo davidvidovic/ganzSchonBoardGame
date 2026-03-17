@@ -279,6 +279,7 @@
             font-size: 30px;
             border-radius: 10px;
             margin: 5px;
+            cursor: pointer;
         }
 
         .dice.white {
@@ -483,7 +484,7 @@
             </div>
 
 
-            <!-- Dice -->
+            <!-- Dice area -->
             <div class="dice-container">
                 <div id="diceArea">
                     <div class="dice" id="dice1">-</div>
@@ -704,6 +705,7 @@
 
                 if (msg.type === "diceRolled") {
                     updateDice(msg.dice);
+                    updatePlayableSquares(msg.playebleFields)
                 }
 
                 if (msg.type === "updateBoard") {
@@ -779,6 +781,92 @@
             }
         };
 
+        document.getElementById("dice1").onclick = async () => {
+            const response = await fetch("/dicePlayed", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    dice: "1",
+                })
+            });
+
+            if (!response.ok) {
+                alert("Failed to play dice.");
+            }
+        };
+
+        document.getElementById("dice2").onclick = async () => {
+            const response = await fetch("/dicePlayed", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    dice: "2",
+                })
+            });
+
+            if (!response.ok) {
+                alert("Failed to play dice.");
+            }
+        };
+
+        document.getElementById("dice3").onclick = async () => {
+            const response = await fetch("/dicePlayed", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    dice: "3",
+                })
+            });
+
+            if (!response.ok) {
+                alert("Failed to play dice.");
+            }
+        };
+
+        document.getElementById("dice4").onclick = async () => {
+            const response = await fetch("/dicePlayed", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    dice: "4",
+                })
+            });
+
+            if (!response.ok) {
+                alert("Failed to play dice.");
+            }
+        };
+
+        document.getElementById("dice5").onclick = async () => {
+            const response = await fetch("/dicePlayed", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    dice: "5",
+                })
+            });
+
+            if (!response.ok) {
+                alert("Failed to play dice.");
+            }
+        };
+
+        document.getElementById("dice6").onclick = async () => {
+            const response = await fetch("/dicePlayed", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    dice: "6",
+                })
+            });
+
+            if (!response.ok) {
+                alert("Failed to play dice.");
+            }
+        };
+
+
+
         function updateDice(data) {
             for (let i = 0; i < 6; i++) {
                 const el = document.getElementById("dice" + (i + 1));
@@ -787,6 +875,13 @@
 
                 el.classList.remove("white", "blue", "yellow", "green", "orange", "purple");
                 el.classList.add(data[i].color);
+
+                if (data[i].isLocked == "1") {
+                    el.disabled = true;
+                }
+                else {
+                    el.disabled = false;
+                }
             }
         }
 
@@ -819,15 +914,19 @@
         }
 
         function updatePlayableSquares(playable) {
-            document.querySelectorAll(".white-square").forEach(s => {
-                s.disabled = true;
+
+            Object.entries(playable).forEach(([board, indexes]) => {
+
+                indexes.forEach(index => {
+
+                    const selector = `.white-square[data-board="${board}"][data-index="${index}"]`;
+                    const el = document.querySelector(selector);
+
+                    if (el) el.disabled = false;
+                });
+
             });
 
-            playable.forEach(p => {
-                const selector = `.white-square[data-board="${p.board}"][data-index="${p.index}"]`;
-                const el = document.querySelector(selector);
-                if (el) el.disabled = false;
-            });
         }
 
         function updateBoard(state) {
