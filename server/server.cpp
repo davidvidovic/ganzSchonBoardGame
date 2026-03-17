@@ -218,7 +218,7 @@ int main()
 
 
         // Update playable fields for this player
-        message["playebleFields"] = player->getPlayebleFieldsAsJSON(game.getDiceValues());
+        message["playebleFields"] = player->getPlayableFieldsAsJSON(game.getDiceValues());
 
         std::string msg = message.dump();
 
@@ -300,9 +300,12 @@ int main()
         if (!body)
             return crow::response(400);
 
-        std::string dice = body["dice"].s();
+        int diceIndex = body["dice"].i() - 1;
+        auto dice = game.getDices().getDices()[diceIndex];
 
-        std::cout << "Dice played: " << dice << std::endl;
+        std::cout << "Dice played: " << dice.gameColorToString(dice.getColor()) << " and value " << dice.getValue() << std::endl;
+
+        // Update board UI with possible playeble squares with this dice
 
         return crow::response(200);
     });

@@ -26,7 +26,7 @@ class PurpleBoard : NumericBoard {
         };
     }
 
-    std::vector<int> isPlayable(int diceValue) override {
+    std::vector<int> isPlayable(int diceValue) const override {
         if(currentIndex >= PURPLE_BOARD_LENGTH) return {};
         if(currentIndex < 1) return {currentIndex};
 

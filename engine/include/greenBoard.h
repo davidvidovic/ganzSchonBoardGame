@@ -25,7 +25,7 @@ class GreenBoard : BooleanBoard {
         board_state = {false, false, false, false, false, false, false, false, false, false, false};
     }
 
-    std::vector<int> isPlayable(int diceValue) override {
+    std::vector<int> isPlayable(int diceValue) const override {
         if(currentIndex >= GREEN_BOARD_LENGTH) return {};
 
         if(diceValue >= board_box_requirements[currentIndex])

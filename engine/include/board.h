@@ -13,7 +13,7 @@ class Board {
     std::vector<GameBonus::GameBonus> board_bonus_map;
 
     public:
-    virtual std::vector<int> isPlayable(int diceValue) = 0;
+    virtual std::vector<int> isPlayable(int diceValue) const = 0;
     virtual void play(int) = 0;
 };
 

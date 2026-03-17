@@ -177,6 +177,12 @@
             font-size: 18px;
         }
 
+        .played-square {
+            background: #aaefa0 !important;
+            color: black !important;
+            opacity: 1 !important;
+        }
+
         #statusBar {
             position: fixed;
             bottom: 0;
@@ -262,6 +268,10 @@
 
         .light-gray {
             background: #848484;
+        }
+
+        .light-green {
+            background: #aaefa0;
         }
 
         /* dice */
@@ -914,6 +924,9 @@
         }
 
         function updatePlayableSquares(playable) {
+            document.querySelectorAll(".white-square").forEach(square => {
+                square.disabled = true;
+            });
 
             Object.entries(playable).forEach(([board, indexes]) => {
 
@@ -935,15 +948,11 @@
                 const index = parseInt(element.dataset.index);
 
                 if (state.yellowBoard[index] === "T") {
-                    element.classList.add("disabled");
+                    element.classList.add("played-square");
                     element.style.pointerEvents = "none";
-                    element.style.opacity = "0.5";
                     element.disabled = true;
                 } else {
-                    element.classList.remove("disabled");
-                    element.style.pointerEvents = "auto";
-                    element.style.opacity = "1";
-                    element.disabled = false;
+                    element.classList.remove("played-square");
                 }
             });
 
@@ -952,15 +961,11 @@
                 const index = parseInt(element.dataset.index);
 
                 if (state.blueBoard[index] === "T") {
-                    element.classList.add("disabled");
+                    element.classList.add("played-square");
                     element.style.pointerEvents = "none";
-                    element.style.opacity = "0.5";
                     element.disabled = true;
                 } else {
-                    element.classList.remove("disabled");
-                    element.style.pointerEvents = "auto";
-                    element.style.opacity = "1";
-                    element.disabled = false;
+                    element.classList.remove("played-square");
                 }
             });
 
@@ -969,31 +974,23 @@
                 const index = parseInt(element.dataset.index);
 
                 if (state.greenBoard[index] === "T") {
-                    element.classList.add("disabled");
+                    element.classList.add("played-square");
                     element.style.pointerEvents = "none";
-                    element.style.opacity = "0.5";
                     element.disabled = true;
                 } else {
-                    element.classList.remove("disabled");
-                    element.style.pointerEvents = "auto";
-                    element.style.opacity = "1";
-                    element.disabled = false;
+                    element.classList.remove("played-square");
                 }
             });
-
             const orangeElements = document.querySelectorAll('.white-square[data-board="orange"]');
             orangeElements.forEach(element => {
                 const index = parseInt(element.dataset.index);
 
                 if (state.orangeBoard[index] === "F") {
-                    element.classList.remove("disabled");
-                    element.style.pointerEvents = "auto";
-                    element.style.opacity = "1";
-                    element.disabled = false;
+                    element.classList.remove("played-square");
+                    element.innerText = "";
                 } else {
-                    element.classList.add("disabled");
+                    element.classList.add("played-square");
                     element.style.pointerEvents = "none";
-                    element.style.opacity = "0.5";
                     element.innerText = state.orangeBoard[index];
                     element.disabled = true;
                 }
@@ -1004,14 +1001,11 @@
                 const index = parseInt(element.dataset.index);
 
                 if (state.purpleBoard[index] === "F") {
-                    element.classList.remove("disabled");
-                    element.style.pointerEvents = "auto";
-                    element.style.opacity = "1";
-                    element.disabled = false;
+                    element.classList.remove("played-square");
+                    element.innerText = "";
                 } else {
-                    element.classList.add("disabled");
+                    element.classList.add("played-square");
                     element.style.pointerEvents = "none";
-                    element.style.opacity = "0.5";
                     element.innerText = state.purpleBoard[index];
                     element.disabled = true;
                 }
