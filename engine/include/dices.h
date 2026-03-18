@@ -8,6 +8,7 @@
 
 #include "dice.h"
 #include "includes.h"
+#include "gameColor.h"
 
 namespace engine {
 

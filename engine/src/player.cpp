@@ -39,6 +39,26 @@ std::vector<GameBonus::GameBonus> Player::getBonuses() {
     return bonuses;
 }
 
+YellowBoard Player::getYellowBoard() const {
+    return yellowBoard;
+}
+
+BlueBoard Player::getBlueBoard() const {
+    return blueBoard;
+}
+
+GreenBoard Player::getGreenBoard() const {
+    return greenBoard;
+}
+
+OrangeBoard Player::getOrangeBoard() const {
+    return orangeBoard;
+}
+
+PurpleBoard Player::getPurpleBoard() const {
+    return purpleBoard;
+}
+
 crow::json::wvalue Player::getBoardAsJSON() {
     crow::json::wvalue message;
 

@@ -183,6 +183,12 @@
             opacity: 1 !important;
         }
 
+        .playable-square {
+            background: #aaf585 !important;
+            color: black !important;
+            opacity: 0.75 !important;
+        }
+
         #statusBar {
             position: fixed;
             bottom: 0;
@@ -728,6 +734,10 @@
                         startGame();
                     }
                 }
+
+                if (msg.type === "dicePlayed") {
+                    dicePlayed(msg.state);
+                }
             };
 
             socket.onclose = () => {
@@ -875,8 +885,6 @@
             }
         };
 
-
-
         function updateDice(data) {
             for (let i = 0; i < 6; i++) {
                 const el = document.getElementById("dice" + (i + 1));
@@ -1009,6 +1017,25 @@
                     element.innerText = state.purpleBoard[index];
                     element.disabled = true;
                 }
+            });
+        }
+
+        function dicePlayed(playable) {
+            document.querySelectorAll(".white-square").forEach(square => {
+                square.classList.remove("playable-square");
+            });
+
+            Object.entries(playable).forEach(([board, indexes]) => {
+
+                indexes.forEach(index => {
+
+                    const selector = `.white-square[data-board="${board}"][data-index="${index}"]`;
+                    const el = document.querySelector(selector);
+
+                    el.classList.add("playable-square");
+                    el.style.pointerEvents = "auto";
+                });
+
             });
         }
 

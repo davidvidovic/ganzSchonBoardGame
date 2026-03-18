@@ -11,6 +11,7 @@
 #include "orangeBoard.h"
 #include "purpleBoard.h"
 #include "includes.h"
+#include "gameColor.h"
 #include "crow.h"
 
 namespace engine {
@@ -40,6 +41,13 @@ class Player {
     bool getIsTurn();
     void setBonuses(GameBonus::GameBonus bonus);
     std::vector<GameBonus::GameBonus> getBonuses();
+
+    YellowBoard getYellowBoard() const;
+    BlueBoard getBlueBoard() const;
+    GreenBoard getGreenBoard() const;
+    OrangeBoard getOrangeBoard() const;
+    PurpleBoard getPurpleBoard() const;
+
     crow::json::wvalue getBoardAsJSON();
     crow::json::wvalue getPlayableFieldsAsJSON(std::unordered_map<GameColor::GameColor, int> dices);
 

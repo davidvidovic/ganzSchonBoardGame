@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "includes.h"
+#include "gameColor.h"
 
 namespace engine {
 

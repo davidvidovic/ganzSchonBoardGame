@@ -7,6 +7,7 @@
 #include "dices.h"
 #include "player.h"
 #include "includes.h"
+#include "gameColor.h"
 
 namespace engine
 {

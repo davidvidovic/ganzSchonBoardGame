@@ -1,5 +1,6 @@
 #include "crow.h"
 #include "../engine/include/gameEngine.h"
+#include "../engine/include/gameColor.h"
 #include <unordered_map>
 #include <random>
 #include <mutex>
@@ -306,6 +307,51 @@ int main()
         std::cout << "Dice played: " << dice.gameColorToString(dice.getColor()) << " and value " << dice.getValue() << std::endl;
 
         // Update board UI with possible playeble squares with this dice
+        crow::json::wvalue message;
+        message["type"] = "dicePlayed";
+        switch(dice.getColor())
+        {
+            case engine::GameColor::GameColor::YELLOW:
+                message["state"]["yellow"] = player->getPlayebleBoardFieldsAsJSON(player->getYellowBoard(), dice.getValue());
+            break;
+
+            case engine::GameColor::GameColor::BLUE:
+                message["state"]["blue"] = player->getPlayebleBoardFieldsAsJSON(player->getBlueBoard(), dice.getValue() + game.getDices().getDice(engine::GameColor::GameColor::WHITE).getValue());
+            break;
+
+            case engine::GameColor::GameColor::GREEN:
+                message["state"]["green"] = player->getPlayebleBoardFieldsAsJSON(player->getGreenBoard(), dice.getValue());
+            break;
+
+            case engine::GameColor::GameColor::ORANGE:
+                message["state"]["orange"] = player->getPlayebleBoardFieldsAsJSON(player->getOrangeBoard(), dice.getValue());
+            break;
+
+            case engine::GameColor::GameColor::PURPLE:
+                message["state"]["purple"] = player->getPlayebleBoardFieldsAsJSON(player->getPurpleBoard(), dice.getValue());
+            break;
+
+            case engine::GameColor::GameColor::WHITE:
+                message["state"]["yellow"] = player->getPlayebleBoardFieldsAsJSON(player->getYellowBoard(), dice.getValue());
+                message["state"]["blue"] = player->getPlayebleBoardFieldsAsJSON(player->getBlueBoard(), dice.getValue() + game.getDices().getDice(engine::GameColor::GameColor::BLUE).getValue());
+                message["state"]["green"] = player->getPlayebleBoardFieldsAsJSON(player->getGreenBoard(), dice.getValue());
+                message["state"]["orange"] = player->getPlayebleBoardFieldsAsJSON(player->getOrangeBoard(), dice.getValue());
+                message["state"]["purple"] = player->getPlayebleBoardFieldsAsJSON(player->getPurpleBoard(), dice.getValue());
+            break;
+
+            default:
+            break;
+        }
+        
+        std::string msg = message.dump();
+
+        {
+            std::lock_guard<std::mutex> lock(connectionsMutex);
+            for (auto* c : connections) {
+                if (c)
+                    c->send_text(msg);
+            }
+        }
 
         return crow::response(200);
     });
