@@ -32,6 +32,7 @@ class GameEngine {
     void startGame();
     void assignRoundBonus();
     Player* findPlayerById(int playerId);
+    crow::json::wvalue getPlayersTurn();
 };
 
 }

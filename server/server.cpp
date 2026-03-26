@@ -298,7 +298,6 @@ int main()
         engine::Player* player = game.findPlayerById(sessionIt->second.playerId);
         if (!player)
             return notFound("Player not found");
-
         player->setName(playerName);
         sessionIt->second.hasName = true;
 
@@ -311,8 +310,9 @@ int main()
                 ++namedPlayers;
         }
 
-        if (namedPlayers == 4)
+        if (namedPlayers == 4) {
             game.startGame();
+        }
 
         broadcastTextLocked(playersMessage.dump());
 
@@ -406,8 +406,8 @@ int main()
         message["dice"] = std::move(diceList);
         message["playebleFields"] = player->getPlayableFieldsAsJSON(game.getDiceValues());
 
-        sendTextToSessionLocked(sessionId, message.dump());
-
+        broadcastTextLocked(message.dump());
+        
         return crow::response(200);
     });
 
@@ -432,6 +432,7 @@ int main()
         crow::json::wvalue message;
         message["type"] = "updateBoard";
         message["state"] = player->getBoardAsJSON();
+        message["playerState"] = game.getPlayersTurn();
 
         sendTextToSessionLocked(sessionId, message.dump());
 

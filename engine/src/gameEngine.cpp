@@ -70,4 +70,15 @@ Player* GameEngine::findPlayerById(int playerId)
     return nullptr;
 }
 
+crow::json::wvalue GameEngine::getPlayersTurn() {
+    crow::json::wvalue message;
+
+    message["player4"] = players[0].getIsTurn() ? "1" : "0";
+    message["player3"] = players[1].getIsTurn() ? "1" : "0";
+    message["player2"] = players[2].getIsTurn() ? "1" : "0";
+    message["player1"] = players[3].getIsTurn() ? "1" : "0";
+
+    return message;
+}
+
 }

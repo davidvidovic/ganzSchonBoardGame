@@ -458,12 +458,12 @@
                 <div class="half-board">
                     <div class="sidebar-panel">
                         <div class="round-row">
-                            <div class="player-info light-gray" id="player1">Player 1</div>
-                            <div class="player-info light-gray" id="player2">Player 2</div>
+                            <div class="player-info light-gray" id="player1"></div>
+                            <div class="player-info light-gray" id="player2"></div>
                         </div>
                         <div class="round-row" style="margin-top:8px;">
-                            <div class="player-info light-gray" id="player3">Player 3</div>
-                            <div class="player-info light-gray" id="player4">Player 4</div>
+                            <div class="player-info light-gray" id="player3"></div>
+                            <div class="player-info light-gray" id="player4"></div>
                         </div>
                     </div>
                 </div>
@@ -817,10 +817,10 @@
         }
 
         function resetPlayerLabels() {
-            document.getElementById("player1").innerText = "Player 1";
-            document.getElementById("player2").innerText = "Player 2";
-            document.getElementById("player3").innerText = "Player 3";
-            document.getElementById("player4").innerText = "Player 4";
+            document.getElementById("player1").innerText = "";
+            document.getElementById("player2").innerText = "";
+            document.getElementById("player3").innerText = "";
+            document.getElementById("player4").innerText = "";
         }
 
         function updatePlayers(data) {
@@ -898,8 +898,22 @@
             });
         }
 
-        function updateBoard(state) {
+        function updateBoard(state, playerState) {
             if (!state) return;
+
+            if (playerState) {
+                Object.entries(playerState).forEach(([player, turnState]) => {
+                    const el = document.getElementById(player);
+
+                    if (el) {
+                        if (turnState === "1") {
+                            el.classList.add("played-square");
+                        } else {
+                            el.classList.remove("played-square");
+                        }
+                    }
+                });
+            }
 
             const yellowElements = document.querySelectorAll('.white-square[data-board="yellow"]');
             yellowElements.forEach(element => {
@@ -1021,7 +1035,7 @@
                 }
 
                 if (msg.type === "updateBoard") {
-                    updateBoard(msg.state);
+                    updateBoard(msg.state, msg.playerState);
                     return;
                 }
 

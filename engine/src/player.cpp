@@ -9,8 +9,8 @@ Player::Player(int id) : id(id) {
 Player::Player(int id, std::string_view name) : id(id), name(name) {
 }
 
-void Player::setName(std::string_view name) {
-    name = name;
+void Player::setName(std::string_view playerName) {
+    name = playerName;
 }
 
 std::string_view Player::getName() const {

@@ -32,7 +32,7 @@ class Player {
     public:
     Player(int id);
     Player(int id, std::string_view name);
-    void setName(std::string_view name);
+    void setName(std::string_view playerName);
     std::string_view getName() const;
     int getId();
     void setIsTurn(bool newTurn);
