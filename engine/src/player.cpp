@@ -2,13 +2,11 @@
 
 namespace engine {
 
-int Player::generateId = 0;
 
-Player::Player() : id(generateId++) {
-    name = "";
+Player::Player(int id) : id(id) {
 }
 
-Player::Player(std::string_view name) : id(generateId++), name(name) {
+Player::Player(int id, std::string_view name) : id(id), name(name) {
 }
 
 void Player::setName(std::string_view name) {

@@ -16,11 +16,6 @@ bool GameEngine::addPlayer(Player& player) {
     return false;
 }
 
-bool GameEngine::addPlayer(std::string_view player_name) {
-    Player p(player_name);
-    return addPlayer(p);
-}
-
 void GameEngine::removePlayer(Player& player) {
     for(size_t i = 0; i < players.size(); i++) {
         if(player == players[i]) {

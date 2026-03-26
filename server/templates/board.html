@@ -154,8 +154,9 @@
             height: 40px;
             margin: 3px;
             display: flex;
-            align-items: left;
-            justify-content: left;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 10px;
             font-size: 14px;
             font-weight: bold;
             border-radius: 6px;
@@ -186,7 +187,7 @@
         .playable-square {
             background: #aaf585 !important;
             color: black !important;
-            opacity: 0.75 !important;
+            opacity: 0.9 !important;
         }
 
         #statusBar {
@@ -194,18 +195,74 @@
             bottom: 0;
             left: 0;
             width: 100%;
-
             background: #333;
             color: white;
-
             padding: 10px;
             text-align: center;
-
             font-size: 16px;
             border-top: 2px solid #555;
         }
 
-        /* bonus colors */
+        .modal {
+            display: flex;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background-color: white;
+            color: black;
+            padding: 30px;
+            border-radius: 12px;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+        }
+
+        #playerName {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        #startGameButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+        }
+
+        #startGameButton:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        #nameError {
+            color: #b00020;
+            margin-top: 12px;
+            min-height: 20px;
+            font-size: 14px;
+        }
+
         .bonus-blue {
             background: #388bdf;
         }
@@ -247,7 +304,6 @@
             background: transparent;
         }
 
-        /* board colors */
         .yellow {
             background: #cfa83a;
         }
@@ -270,6 +326,7 @@
 
         .white {
             background: #ffffff;
+            color: black;
         }
 
         .light-gray {
@@ -280,7 +337,6 @@
             background: #aaefa0;
         }
 
-        /* dice */
         .dice-container {
             margin-top: 30px;
             text-align: center;
@@ -296,6 +352,9 @@
             border-radius: 10px;
             margin: 5px;
             cursor: pointer;
+            user-select: none;
+            opacity: 0.6;
+            pointer-events: none;
         }
 
         .dice.white {
@@ -342,12 +401,19 @@
 
 <body>
 
+    <div class="modal" id="nameModal">
+        <div class="modal-content">
+            <h2>Enter your name</h2>
+            <input type="text" id="playerName" placeholder="Your name" maxlength="32" autocomplete="off">
+            <div id="nameError"></div>
+            <button id="startGameButton" onclick="submitName()" disabled>Join Game</button>
+        </div>
+    </div>
+
     <div class="board">
-        <!-- TOP SIDEBAR -->
         <div class="sidebar">
             <div class="top-section">
                 <div class="half-board">
-
                     <div class="sidebar-panel">
                         <div class="round-row">
                             <div class="round-box active-round">1</div>
@@ -406,12 +472,11 @@
 
         <div class="top-section">
 
-            <!-- YELLOW BOARD -->
             <div class="half-board">
                 <div class="board-row yellow">
                     <div class="grid">
                         <div class="square-row">
-                            <div class="board-info bonus-empty" data-board="yellow"></div>
+                            <div class="board-info bonus-empty"></div>
                             <button class="white-square" data-board="yellow" data-index="0">1</button>
                             <button class="white-square" data-board="yellow" data-index="1">X</button>
                             <button class="white-square" data-board="yellow" data-index="2">4</button>
@@ -420,7 +485,7 @@
                         </div>
 
                         <div class="square-row">
-                            <div class="board-info bonus-empty" data-board="yellow"></div>
+                            <div class="board-info bonus-empty"></div>
                             <button class="white-square" data-board="yellow" data-index="4">5</button>
                             <button class="white-square" data-board="yellow" data-index="5">4</button>
                             <button class="white-square" data-board="yellow" data-index="6">6</button>
@@ -429,7 +494,7 @@
                         </div>
 
                         <div class="square-row">
-                            <div class="board-info bonus-empty" data-board="yellow"></div>
+                            <div class="board-info bonus-empty"></div>
                             <button class="white-square" data-board="yellow" data-index="8">X</button>
                             <button class="white-square" data-board="yellow" data-index="9">5</button>
                             <button class="white-square" data-board="yellow" data-index="10">2</button>
@@ -438,7 +503,7 @@
                         </div>
 
                         <div class="square-row">
-                            <div class="board-info bonus-empty" data-board="yellow"></div>
+                            <div class="board-info bonus-empty"></div>
                             <button class="white-square" data-board="yellow" data-index="12">2</button>
                             <button class="white-square" data-board="yellow" data-index="13">3</button>
                             <button class="white-square" data-board="yellow" data-index="14">X</button>
@@ -454,16 +519,13 @@
                             <div class="board-info bonus-gray">⟳</div>
                             <div class="board-info bonus-fox">🦊</div>
                         </div>
-
                     </div>
                 </div>
             </div>
 
-            <!-- BLUE BOARD -->
             <div class="half-board">
                 <div class="board-row blue">
                     <div class="grid">
-
                         <div class="square-row">
                             <button class="white-square" data-board="blue" data-index="0">2</button>
                             <button class="white-square" data-board="blue" data-index="1">5</button>
@@ -494,13 +556,10 @@
                             <div class="board-info bonus-yellow">X</div>
                             <div class="board-info bonus-black">+1</div>
                         </div>
-
                     </div>
                 </div>
             </div>
 
-
-            <!-- Dice area -->
             <div class="dice-container">
                 <div id="diceArea">
                     <div class="dice" id="dice1">-</div>
@@ -511,15 +570,11 @@
                     <div class="dice" id="dice6">-</div>
                 </div>
 
-                <button id="rollButton" class="roll-button">Roll Dice</button>
+                <button id="rollButton" class="roll-button" disabled>Roll Dice</button>
             </div>
-
-
         </div>
-        <!-- GREEN BOARD -->
-        <div class="board-row green">
 
-            <!-- score indicators -->
+        <div class="board-row green">
             <div class="square-row">
                 <div class="score-box">1</div>
                 <div class="score-box">3</div>
@@ -534,7 +589,6 @@
                 <div class="score-box">66</div>
             </div>
 
-            <!-- playable buttons -->
             <div class="square-row">
                 <button class="white-square" data-board="green" data-index="0">≥2</button>
                 <button class="white-square" data-board="green" data-index="1">≥4</button>
@@ -549,7 +603,6 @@
                 <button class="white-square" data-board="green" data-index="10">≥6</button>
             </div>
 
-            <!-- bonuses -->
             <div class="square-row">
                 <div class="board-info bonus-empty"></div>
                 <div class="board-info bonus-empty"></div>
@@ -563,13 +616,9 @@
                 <div class="board-info bonus-empty"></div>
                 <div class="board-info bonus-empty"></div>
             </div>
-
         </div>
 
-        <!-- ORANGE BOARD -->
         <div class="board-row orange">
-
-            <!-- multipliers -->
             <div class="square-row">
                 <div class="board-info bonus-black">-1</div>
                 <div class="board-info bonus-empty"></div>
@@ -584,7 +633,6 @@
                 <div class="board-info bonus-orange">x4</div>
             </div>
 
-            <!-- clickable input squares -->
             <div class="square-row">
                 <button class="white-square" data-board="orange" data-index="0"></button>
                 <button class="white-square" data-board="orange" data-index="1"></button>
@@ -599,7 +647,6 @@
                 <button class="white-square" data-board="orange" data-index="10"></button>
             </div>
 
-            <!-- bonuses -->
             <div class="square-row">
                 <div class="board-info bonus-empty"></div>
                 <div class="board-info bonus-empty"></div>
@@ -613,12 +660,9 @@
                 <div class="board-info bonus-green">X</div>
                 <div class="board-info bonus-empty"></div>
             </div>
-
         </div>
 
-        <!-- PURPLE BOARD -->
         <div class="board-row purple">
-
             <div class="square-row">
                 <button class="white-square" data-board="purple" data-index="0"></button>
                 <div class="arrow-square arrow">&gt;</div>
@@ -653,7 +697,6 @@
                 <button class="white-square" data-board="purple" data-index="10"></button>
             </div>
 
-            <!-- purple bonuses aligned with square positions -->
             <div class="square-row">
                 <div class="board-info bonus-empty"></div>
                 <div class="arrow-square bonus-empty"></div>
@@ -687,278 +730,184 @@
 
                 <div class="board-info bonus-black">+1</div>
             </div>
-
         </div>
 
-        <div id="statusBar">
-            Waiting for players...
-        </div>
+        <div id="statusBar">Connecting to server...</div>
     </div>
 
     <script>
         function diceToUnicode(value) {
             const map = ["", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
-            return map[value];
+            return map[value] || "-";
         }
 
         let socket = null;
+        let socketReady = false;
+        let sessionId = "";
+        let hasValidName = false;
+        let gameStarted = false;
 
-        function connectWebSocket() {
-            const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
-            socket = new WebSocket(protocol + window.location.host + "/ws");
-
-            socket.onopen = () => {
-                console.log("WebSocket connected");
-                playerJoined();
-
-                document.querySelectorAll(".white-square").forEach(s => {
-                    s.disabled = true;
-                });
-            };
-
-            socket.onmessage = (event) => {
-                const msg = JSON.parse(event.data);
-
-                if (msg.type === "diceRolled") {
-                    updateDice(msg.dice);
-                    updatePlayableSquares(msg.playebleFields)
-                }
-
-                if (msg.type === "updateBoard") {
-                    updateBoard(msg.state);
-                }
-
-                if (msg.type === "playerJoined") {
-                    updatePlayers(msg);
-                    if (msg.startGame == "true") {
-                        startGame();
-                    }
-                }
-
-                if (msg.type === "dicePlayed") {
-                    dicePlayed(msg.state);
-                }
-            };
-
-            socket.onclose = () => {
-                console.log("WebSocket disconnected");
-                playerLeft();
-            };
-
-            socket.onerror = (err) => {
-                console.error("WebSocket error:", err);
-            };
+        function updateStatus(message) {
+            document.getElementById("statusBar").innerText = message;
         }
 
-        connectWebSocket();
-
-        document.querySelectorAll(".white-square").forEach(square => {
-            square.addEventListener("click", () => {
-                if (square.disabled) return;
-
-                const board = square.dataset.board;
-                const index = square.dataset.index;
-
-                playMove(board, index);
-            });
-        });
-
-        async function playMove(board, index) {
-            const response = await fetch("/playMove", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    board: board,
-                    index: index
-                })
-            });
-
-            const state = await response.json();
-            updateBoard(state);
+        function setNameError(message) {
+            document.getElementById("nameError").innerText = message;
         }
 
-        async function playerJoined() {
-            const response = await fetch("/playerJoined", { method: "POST" });
+        function setStartButtonEnabled(enabled) {
+            document.getElementById("startGameButton").disabled = !enabled;
+        }
 
-            if (!response.ok) {
-                alert("Failed to join the player.");
+        function setRollEnabled(enabled) {
+            document.getElementById("rollButton").disabled = !enabled;
+        }
+
+        function disableAllBoardSquares() {
+            document.querySelectorAll(".white-square").forEach(square => {
+                square.disabled = true;
+                square.style.pointerEvents = "none";
+                square.classList.remove("playable-square");
+            });
+        }
+
+        function disableAllDice() {
+            for (let i = 1; i <= 6; i++) {
+                const die = document.getElementById("dice" + i);
+                die.style.pointerEvents = "none";
+                die.style.opacity = "0.6";
             }
         }
 
-        async function playerLeft() {
-            const response = await fetch("/playerLeft", { method: "POST" });
+        function enableDiceByCurrentState() {
+            if (!hasValidName || !gameStarted) {
+                disableAllDice();
+                return;
+            }
 
-            if (!response.ok) {
-                alert("Failed to delete a disconnected player.");
+            for (let i = 1; i <= 6; i++) {
+                const die = document.getElementById("dice" + i);
+                if (!die.dataset.locked || die.dataset.locked === "0") {
+                    die.style.pointerEvents = "auto";
+                    die.style.opacity = "1";
+                }
             }
         }
 
-        document.getElementById("rollButton").onclick = async () => {
-            const response = await fetch("/rollDice", { method: "POST" });
-
-            if (!response.ok) {
-                alert("Failed to roll dice.");
+        function applyInteractionState() {
+            if (!hasValidName || !gameStarted) {
+                setRollEnabled(false);
+                disableAllDice();
+                disableAllBoardSquares();
+                return;
             }
-        };
 
-        document.getElementById("dice1").onclick = async () => {
-            const response = await fetch("/dicePlayed", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    dice: "1",
-                })
-            });
+            setRollEnabled(true);
+            enableDiceByCurrentState();
+        }
 
-            if (!response.ok) {
-                alert("Failed to play dice.");
+        function unlockAfterValidName() {
+            hasValidName = true;
+            document.getElementById("nameModal").classList.add("hidden");
+            applyInteractionState();
+
+            if (!gameStarted) {
+                updateStatus("Joined successfully. Waiting for enough players to start...");
             }
-        };
+        }
 
-        document.getElementById("dice2").onclick = async () => {
-            const response = await fetch("/dicePlayed", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    dice: "2",
-                })
-            });
+        function resetPlayerLabels() {
+            document.getElementById("player1").innerText = "Player 1";
+            document.getElementById("player2").innerText = "Player 2";
+            document.getElementById("player3").innerText = "Player 3";
+            document.getElementById("player4").innerText = "Player 4";
+        }
 
-            if (!response.ok) {
-                alert("Failed to play dice.");
+        function updatePlayers(data) {
+            resetPlayerLabels();
+
+            const numberOfPlayers = Number(data.numberOfPlayers || 0);
+            const players = data.players || [];
+
+            for (let i = 0; i < numberOfPlayers && i < 4; i++) {
+                const el = document.getElementById("player" + (i + 1));
+                if (el && players[i] && players[i].name && players[i].name.trim() !== "") {
+                    el.innerText = players[i].name;
+                }
             }
-        };
 
-        document.getElementById("dice3").onclick = async () => {
-            const response = await fetch("/dicePlayed", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    dice: "3",
-                })
-            });
+            if (String(data.startGame) === "true") {
+                gameStarted = true;
+                updateStatus("Game started.");
+                applyInteractionState();
+                startGame();
+            } else {
+                gameStarted = false;
+                applyInteractionState();
 
-            if (!response.ok) {
-                alert("Failed to play dice.");
+                if (numberOfPlayers < 4) {
+                    updateStatus("Waiting for " + (4 - numberOfPlayers) + " more players...");
+                } else {
+                    updateStatus("All players joined. Preparing game...");
+                }
             }
-        };
-
-        document.getElementById("dice4").onclick = async () => {
-            const response = await fetch("/dicePlayed", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    dice: "4",
-                })
-            });
-
-            if (!response.ok) {
-                alert("Failed to play dice.");
-            }
-        };
-
-        document.getElementById("dice5").onclick = async () => {
-            const response = await fetch("/dicePlayed", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    dice: "5",
-                })
-            });
-
-            if (!response.ok) {
-                alert("Failed to play dice.");
-            }
-        };
-
-        document.getElementById("dice6").onclick = async () => {
-            const response = await fetch("/dicePlayed", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    dice: "6",
-                })
-            });
-
-            if (!response.ok) {
-                alert("Failed to play dice.");
-            }
-        };
+        }
 
         function updateDice(data) {
             for (let i = 0; i < 6; i++) {
                 const el = document.getElementById("dice" + (i + 1));
+                const die = data[i];
 
-                el.innerText = diceToUnicode(data[i].value);
+                if (!die) {
+                    el.innerText = "-";
+                    el.classList.remove("white", "blue", "yellow", "green", "orange", "purple");
+                    el.dataset.locked = "1";
+                    el.style.pointerEvents = "none";
+                    el.style.opacity = "0.6";
+                    continue;
+                }
 
+                el.innerText = diceToUnicode(die.value);
                 el.classList.remove("white", "blue", "yellow", "green", "orange", "purple");
-                el.classList.add(data[i].color);
-
-                if (data[i].isLocked == "1") {
-                    el.disabled = true;
-                }
-                else {
-                    el.disabled = false;
-                }
-            }
-        }
-
-        function updatePlayers(data) {
-            const numberOfPlayers = data.numberOfPlayers;
-            for (let i = 0; i < numberOfPlayers; i++) {
-                const el = document.getElementById("player" + (i + 1));
-                el.innerText = data.players[i].name;
+                el.classList.add(die.color);
+                el.dataset.locked = (String(die.isLocked) === "1" || die.isLocked === true) ? "1" : "0";
             }
 
-            if (numberOfPlayers < 4) {
-                updateStatus("Waiting for " + (4 - numberOfPlayers) + " more players...");
-            }
-            else {
-                updateStatus("Starting the game.")
-            }
-        }
-
-        function updateStatus(message) {
-            const status = document.getElementById("statusBar");
-            status.innerText = message;
-        }
-
-        async function startGame() {
-            const response = await fetch("/updateBoard", { method: "POST" });
-
-            if (!response.ok) {
-                alert("Failed to start the game.");
-            }
+            enableDiceByCurrentState();
         }
 
         function updatePlayableSquares(playable) {
-            document.querySelectorAll(".white-square").forEach(square => {
-                square.disabled = true;
-            });
+            disableAllBoardSquares();
+
+            if (!playable || !hasValidName || !gameStarted) {
+                return;
+            }
 
             Object.entries(playable).forEach(([board, indexes]) => {
+                if (!Array.isArray(indexes)) return;
 
                 indexes.forEach(index => {
-
                     const selector = `.white-square[data-board="${board}"][data-index="${index}"]`;
                     const el = document.querySelector(selector);
 
-                    if (el) el.disabled = false;
+                    if (el && !el.classList.contains("played-square")) {
+                        el.disabled = false;
+                        el.style.pointerEvents = "auto";
+                    }
                 });
-
             });
-
         }
 
         function updateBoard(state) {
+            if (!state) return;
+
             const yellowElements = document.querySelectorAll('.white-square[data-board="yellow"]');
             yellowElements.forEach(element => {
                 const index = parseInt(element.dataset.index);
-
-                if (state.yellowBoard[index] === "T") {
+                if (state.yellowBoard && state.yellowBoard[index] === "T") {
                     element.classList.add("played-square");
-                    element.style.pointerEvents = "none";
                     element.disabled = true;
+                    element.style.pointerEvents = "none";
                 } else {
                     element.classList.remove("played-square");
                 }
@@ -967,11 +916,10 @@
             const blueElements = document.querySelectorAll('.white-square[data-board="blue"]');
             blueElements.forEach(element => {
                 const index = parseInt(element.dataset.index);
-
-                if (state.blueBoard[index] === "T") {
+                if (state.blueBoard && state.blueBoard[index] === "T") {
                     element.classList.add("played-square");
-                    element.style.pointerEvents = "none";
                     element.disabled = true;
+                    element.style.pointerEvents = "none";
                 } else {
                     element.classList.remove("played-square");
                 }
@@ -980,42 +928,40 @@
             const greenElements = document.querySelectorAll('.white-square[data-board="green"]');
             greenElements.forEach(element => {
                 const index = parseInt(element.dataset.index);
-
-                if (state.greenBoard[index] === "T") {
+                if (state.greenBoard && state.greenBoard[index] === "T") {
                     element.classList.add("played-square");
-                    element.style.pointerEvents = "none";
                     element.disabled = true;
+                    element.style.pointerEvents = "none";
                 } else {
                     element.classList.remove("played-square");
                 }
             });
+
             const orangeElements = document.querySelectorAll('.white-square[data-board="orange"]');
             orangeElements.forEach(element => {
                 const index = parseInt(element.dataset.index);
-
-                if (state.orangeBoard[index] === "F") {
+                if (state.orangeBoard && state.orangeBoard[index] === "F") {
                     element.classList.remove("played-square");
                     element.innerText = "";
-                } else {
+                } else if (state.orangeBoard) {
                     element.classList.add("played-square");
                     element.style.pointerEvents = "none";
-                    element.innerText = state.orangeBoard[index];
                     element.disabled = true;
+                    element.innerText = state.orangeBoard[index];
                 }
             });
 
             const purpleElements = document.querySelectorAll('.white-square[data-board="purple"]');
             purpleElements.forEach(element => {
                 const index = parseInt(element.dataset.index);
-
-                if (state.purpleBoard[index] === "F") {
+                if (state.purpleBoard && state.purpleBoard[index] === "F") {
                     element.classList.remove("played-square");
                     element.innerText = "";
-                } else {
+                } else if (state.purpleBoard) {
                     element.classList.add("played-square");
                     element.style.pointerEvents = "none";
-                    element.innerText = state.purpleBoard[index];
                     element.disabled = true;
+                    element.innerText = state.purpleBoard[index];
                 }
             });
         }
@@ -1025,23 +971,217 @@
                 square.classList.remove("playable-square");
             });
 
+            if (!playable || !hasValidName || !gameStarted) {
+                return;
+            }
+
             Object.entries(playable).forEach(([board, indexes]) => {
+                if (!Array.isArray(indexes)) return;
 
                 indexes.forEach(index => {
-
                     const selector = `.white-square[data-board="${board}"][data-index="${index}"]`;
                     const el = document.querySelector(selector);
 
-                    el.classList.add("playable-square");
-                    el.style.pointerEvents = "auto";
+                    if (el && !el.disabled) {
+                        el.classList.add("playable-square");
+                        el.style.pointerEvents = "auto";
+                    }
                 });
-
             });
         }
 
-        function setRollEnabled(enabled) {
-            document.getElementById("rollButton").disabled = !enabled;
+        function connectWebSocket() {
+            const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+            socket = new WebSocket(protocol + window.location.host + "/ws");
+
+            socket.onopen = () => {
+                updateStatus("WebSocket connected. Waiting for session...");
+            };
+
+            socket.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+
+                if (msg.type === "sessionCreated") {
+                    socketReady = true;
+                    sessionId = msg.sessionId || "";
+                    setStartButtonEnabled(true);
+                    updateStatus("Session created. Enter your name.");
+                    return;
+                }
+
+                if (msg.type === "playerJoined") {
+                    updatePlayers(msg);
+                    return;
+                }
+
+                if (msg.type === "diceRolled") {
+                    updateDice(msg.dice);
+                    updatePlayableSquares(msg.playebleFields);
+                    return;
+                }
+
+                if (msg.type === "updateBoard") {
+                    updateBoard(msg.state);
+                    return;
+                }
+
+                if (msg.type === "dicePlayed") {
+                    dicePlayed(msg.state);
+                    return;
+                }
+            };
+
+            socket.onclose = () => {
+                socketReady = false;
+                setStartButtonEnabled(false);
+                setRollEnabled(false);
+                disableAllDice();
+                disableAllBoardSquares();
+                updateStatus("WebSocket disconnected.");
+            };
+
+            socket.onerror = () => {
+                updateStatus("WebSocket error.");
+            };
         }
+
+        async function submitName() {
+            const nameInput = document.getElementById("playerName");
+            const name = nameInput.value.trim();
+
+            if (!socketReady) {
+                setNameError("Session is not ready yet.");
+                return;
+            }
+
+            if (!name) {
+                setNameError("Please enter a valid name.");
+                return;
+            }
+
+            setNameError("");
+            setStartButtonEnabled(false);
+
+            try {
+                const response = await fetch("/setName", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name: name,
+                        sessionId: sessionId
+                    })
+                });
+
+                if (!response.ok) {
+                    setNameError("Failed to set name on server.");
+                    setStartButtonEnabled(true);
+                    return;
+                }
+
+                unlockAfterValidName();
+            } catch (err) {
+                console.error(err);
+                setNameError("Error contacting server.");
+                setStartButtonEnabled(true);
+            }
+        }
+
+        async function startGame() {
+            if (!sessionId) return;
+
+            const response = await fetch("/updateBoard", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    sessionId: sessionId
+                })
+            });
+
+            if (!response.ok) {
+                console.error("Failed to initialize board state.");
+            }
+        }
+
+        async function playMove(board, index) {
+            const response = await fetch("/playMove", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    board: board,
+                    index: index,
+                    sessionId: sessionId
+                })
+            });
+
+            if (!response.ok) {
+                alert("Failed to play move.");
+            }
+        }
+
+        async function sendDicePlayed(diceNumber) {
+            if (!hasValidName || !gameStarted) return;
+
+            const response = await fetch("/dicePlayed", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    dice: String(diceNumber),
+                    sessionId: sessionId
+                })
+            });
+
+            if (!response.ok) {
+                alert("Failed to play dice.");
+            }
+        }
+
+        document.getElementById("playerName").addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                submitName();
+            }
+        });
+
+        document.getElementById("rollButton").onclick = async () => {
+            if (!hasValidName || !gameStarted) return;
+
+            const response = await fetch("/rollDice", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    sessionId: sessionId
+                })
+            });
+
+            if (!response.ok) {
+                alert("Failed to roll dice.");
+            }
+        };
+
+        document.getElementById("dice1").onclick = () => sendDicePlayed(1);
+        document.getElementById("dice2").onclick = () => sendDicePlayed(2);
+        document.getElementById("dice3").onclick = () => sendDicePlayed(3);
+        document.getElementById("dice4").onclick = () => sendDicePlayed(4);
+        document.getElementById("dice5").onclick = () => sendDicePlayed(5);
+        document.getElementById("dice6").onclick = () => sendDicePlayed(6);
+
+        document.querySelectorAll(".white-square").forEach(square => {
+            square.addEventListener("click", () => {
+                if (!hasValidName || !gameStarted || square.disabled) return;
+
+                const board = square.dataset.board;
+                const index = square.dataset.index;
+
+                if (board && index !== undefined) {
+                    playMove(board, index);
+                }
+            });
+        });
+
+        resetPlayerLabels();
+        disableAllBoardSquares();
+        disableAllDice();
+        setRollEnabled(false);
+        connectWebSocket();
     </script>
 
 </body>
