@@ -185,7 +185,7 @@
         }
 
         .playable-square {
-            background: #aaf585 !important;
+            background: #e223f3 !important;
             color: black !important;
             opacity: 0.9 !important;
         }
@@ -746,6 +746,10 @@
         let sessionId = "";
         let hasValidName = false;
         let gameStarted = false;
+        let myPlayerName = "";
+        let myPlayerBoxId = "";
+        let isMyTurn = false;
+        let diceWereRolled = false;
 
         function updateStatus(message) {
             document.getElementById("statusBar").innerText = message;
@@ -780,7 +784,7 @@
         }
 
         function enableDiceByCurrentState() {
-            if (!hasValidName || !gameStarted) {
+            if (!hasValidName || !gameStarted || !isMyTurn || !diceWereRolled) {
                 disableAllDice();
                 return;
             }
@@ -790,6 +794,9 @@
                 if (!die.dataset.locked || die.dataset.locked === "0") {
                     die.style.pointerEvents = "auto";
                     die.style.opacity = "1";
+                } else {
+                    die.style.pointerEvents = "none";
+                    die.style.opacity = "0.6";
                 }
             }
         }
@@ -802,8 +809,7 @@
                 return;
             }
 
-            setRollEnabled(true);
-            enableDiceByCurrentState();
+            updateTurnBasedControls();
         }
 
         function unlockAfterValidName() {
@@ -829,10 +835,16 @@
             const numberOfPlayers = Number(data.numberOfPlayers || 0);
             const players = data.players || [];
 
+            myPlayerBoxId = "";
+
             for (let i = 0; i < numberOfPlayers && i < 4; i++) {
                 const el = document.getElementById("player" + (i + 1));
                 if (el && players[i] && players[i].name && players[i].name.trim() !== "") {
                     el.innerText = players[i].name;
+
+                    if (myPlayerName && players[i].name === myPlayerName) {
+                        myPlayerBoxId = "player" + (i + 1);
+                    }
                 }
             }
 
@@ -854,6 +866,8 @@
         }
 
         function updateDice(data) {
+            diceWereRolled = true;
+
             for (let i = 0; i < 6; i++) {
                 const el = document.getElementById("dice" + (i + 1));
                 const die = data[i];
@@ -873,7 +887,7 @@
                 el.dataset.locked = (String(die.isLocked) === "1" || die.isLocked === true) ? "1" : "0";
             }
 
-            enableDiceByCurrentState();
+            updateTurnBasedControls();
         }
 
         function updatePlayableSquares(playable) {
@@ -901,6 +915,9 @@
         function updateBoard(state, playerState) {
             if (!state) return;
 
+            const previousIsMyTurn = isMyTurn;
+            isMyTurn = false;
+
             if (playerState) {
                 Object.entries(playerState).forEach(([player, turnState]) => {
                     const el = document.getElementById(player);
@@ -912,8 +929,17 @@
                             el.classList.remove("played-square");
                         }
                     }
+
+                    if (myPlayerBoxId && player === myPlayerBoxId && turnState === "1") {
+                        isMyTurn = true;
+                    }
                 });
             }
+
+            if (previousIsMyTurn !== isMyTurn) {
+                diceWereRolled = false;
+            }
+            updateTurnBasedControls();
 
             const yellowElements = document.querySelectorAll('.white-square[data-board="yellow"]');
             yellowElements.forEach(element => {
@@ -1002,6 +1028,18 @@
                     }
                 });
             });
+        }
+
+        function updateTurnBasedControls() {
+            const canRoll = hasValidName && gameStarted && isMyTurn;
+            setRollEnabled(canRoll);
+
+            if (!hasValidName || !gameStarted || !isMyTurn || !diceWereRolled) {
+                disableAllDice();
+                return;
+            }
+
+            enableDiceByCurrentState();
         }
 
         function connectWebSocket() {
@@ -1093,6 +1131,7 @@
                 }
 
                 unlockAfterValidName();
+                myPlayerName = name;
             } catch (err) {
                 console.error(err);
                 setNameError("Error contacting server.");
@@ -1156,7 +1195,7 @@
         });
 
         document.getElementById("rollButton").onclick = async () => {
-            if (!hasValidName || !gameStarted) return;
+            if (!hasValidName || !gameStarted || !isMyTurn) return;
 
             const response = await fetch("/rollDice", {
                 method: "POST",
@@ -1164,7 +1203,7 @@
                 body: JSON.stringify({
                     sessionId: sessionId
                 })
-            });
+            });1
 
             if (!response.ok) {
                 alert("Failed to roll dice.");

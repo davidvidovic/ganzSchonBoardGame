@@ -434,7 +434,7 @@ int main()
         message["state"] = player->getBoardAsJSON();
         message["playerState"] = game.getPlayersTurn();
 
-        sendTextToSessionLocked(sessionId, message.dump());
+        broadcastTextLocked(message.dump());
 
         return crow::response(200);
     });
