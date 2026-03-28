@@ -32,7 +32,6 @@ class Dice {
     void setLocked(bool lockedValue);
 
     void rollDice();
-    std::string gameColorToString(GameColor::GameColor color);
 
     friend bool operator== (const Dice& c1, const Dice& c2);
     friend bool operator!= (const Dice& c1, const Dice& c2);

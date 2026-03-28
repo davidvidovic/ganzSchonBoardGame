@@ -40,11 +40,11 @@ class Player {
     void setBonuses(GameBonus::GameBonus bonus);
     std::vector<GameBonus::GameBonus> getBonuses();
 
-    YellowBoard getYellowBoard() const;
-    BlueBoard getBlueBoard() const;
-    GreenBoard getGreenBoard() const;
-    OrangeBoard getOrangeBoard() const;
-    PurpleBoard getPurpleBoard() const;
+    YellowBoard& getYellowBoard();
+    BlueBoard& getBlueBoard();
+    GreenBoard& getGreenBoard();
+    OrangeBoard& getOrangeBoard();
+    PurpleBoard& getPurpleBoard();
 
     crow::json::wvalue getBoardAsJSON();
     crow::json::wvalue getPlayableFieldsAsJSON(std::unordered_map<GameColor::GameColor, int> dices);

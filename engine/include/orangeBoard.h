@@ -35,7 +35,7 @@ class OrangeBoard : NumericBoard {
     void play([[maybe_unused]] int diceValue) override {
         int new_value = diceValue * board_multipliers[currentIndex];
         score += new_value;
-        board_values[currentIndex] = new_value;
+        board_values[currentIndex] = diceValue;
         board_state[currentIndex] = true;
         currentIndex++;
     }
@@ -46,13 +46,15 @@ class OrangeBoard : NumericBoard {
 
     std::string getBoardAsString() {
         std::string board;
+        int it = 0;
         for(const auto& v : board_state) {
             if(v) {
-                board.append(std::to_string(board_values[currentIndex]));
+                board.append(std::to_string(board_values[it]));
             }
             else {
                 board.append("F");
             }
+            ++it;
         }
 
         return board;

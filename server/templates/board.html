@@ -893,7 +893,7 @@
         function updatePlayableSquares(playable) {
             disableAllBoardSquares();
 
-            if (!playable || !hasValidName || !gameStarted) {
+            if (!playable || !hasValidName || !gameStarted || !isMyTurn) {
                 return;
             }
 
@@ -1169,6 +1169,8 @@
             if (!response.ok) {
                 alert("Failed to play move.");
             }
+
+            disableAllBoardSquares();
         }
 
         async function sendDicePlayed(diceNumber) {

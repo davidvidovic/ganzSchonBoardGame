@@ -395,7 +395,7 @@ int main()
         for (std::size_t i = 0; i < dices.size(); ++i)
         {
             crow::json::wvalue obj;
-            obj["color"] = dices[i].gameColorToString(dices[i].getColor());
+            obj["color"] = engine::GameColor::gameColorToString(dices[i].getColor());
             obj["value"] = dices[i].getValue();
             obj["isLocked"] = dices[i].getLocked() ? "1" : "0";
             diceList[i] = std::move(obj);
@@ -466,9 +466,10 @@ int main()
             return badRequest("Invalid dice index");
 
         auto dice = dices[diceIndex];
+        game.setDiceColorLastPlayed(dice.getColor());
 
         std::cout << "Dice played by playerId=" << sessionIt->second.playerId
-                  << ": " << dice.gameColorToString(dice.getColor())
+                  << ": " << engine::GameColor::gameColorToString(dice.getColor())
                   << " value=" << dice.getValue() << std::endl;
 
         crow::json::wvalue message;
@@ -521,6 +522,77 @@ int main()
             default:
                 break;
         }
+
+        sendTextToSessionLocked(sessionId, message.dump());
+
+        return crow::response(200);
+    });
+
+    CROW_ROUTE(app, "/playMove").methods("POST"_method)
+    ([&](const crow::request& req) {
+        auto body = crow::json::load(req.body);
+        if (!body || !body.has("board") || !body.has("index"))
+            return badRequest("Missing board information");
+
+        const std::string sessionId = getSessionIdFromRequest(req, &body);
+        if (sessionId.empty())
+            return forbidden("Missing sessionId");
+
+        std::lock_guard<std::mutex> lock(stateMutex);
+
+        auto sessionIt = sessionsById.find(sessionId);
+        if (sessionIt == sessionsById.end())
+            return forbidden("Invalid sessionId");
+
+        engine::Player* player = game.findPlayerById(sessionIt->second.playerId);
+        if (!player)
+            return notFound("Player not found");
+
+        engine::GameColor::GameColor boardColor;
+        try {
+            boardColor = engine::GameColor::stringToGameColor(body["board"].s());
+        } catch (const std::exception&) {
+            return badRequest("Invalid board");
+        }
+        int boardIndex = body["index"].i();
+
+        std::cout << "Board move played by playerId=" << sessionIt->second.playerId
+                  << ": " << boardColor
+                  << " index=" << boardIndex << std::endl;
+        switch (boardColor)
+        {
+            case engine::GameColor::GameColor::YELLOW:
+                player->getYellowBoard().play(boardIndex);
+                break;
+
+            case engine::GameColor::GameColor::BLUE:
+                player->getBlueBoard().play(boardIndex);
+                break;
+
+            case engine::GameColor::GameColor::GREEN:
+                player->getGreenBoard().play(boardIndex);
+                break;
+
+            case engine::GameColor::GameColor::ORANGE:
+                // game.getDiceColorLastPlayed() is here because of possiblity to choose WHITE or ORANGE
+                player->getOrangeBoard().play(game.getDices().getDice(game.getDiceColorLastPlayed()).getValue());
+                break;
+
+            case engine::GameColor::GameColor::PURPLE:
+                // game.getDiceColorLastPlayed() is here because of possiblity to choose WHITE or PURPLE
+                player->getPurpleBoard().play(game.getDices().getDice(game.getDiceColorLastPlayed()).getValue());
+                break;
+
+            default:
+                return badRequest("Unsupported board");
+        }
+
+        crow::json::wvalue message;
+        message["type"] = "updateBoard";
+        message["state"] = player->getBoardAsJSON();
+        message["playerState"] = game.getPlayersTurn();
+
+        std::cout << player->getOrangeBoard().getBoardAsString() << std::endl;
 
         sendTextToSessionLocked(sessionId, message.dump());
 

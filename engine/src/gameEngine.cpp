@@ -81,4 +81,12 @@ crow::json::wvalue GameEngine::getPlayersTurn() {
     return message;
 }
 
+void GameEngine::setDiceColorLastPlayed(GameColor::GameColor color) {
+    diceColorLastPlayed = color;
+}
+
+GameColor::GameColor GameEngine::getDiceColorLastPlayed() {
+    return diceColorLastPlayed;
+}
+
 }

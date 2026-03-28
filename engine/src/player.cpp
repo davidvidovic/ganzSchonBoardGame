@@ -37,23 +37,23 @@ std::vector<GameBonus::GameBonus> Player::getBonuses() {
     return bonuses;
 }
 
-YellowBoard Player::getYellowBoard() const {
+YellowBoard& Player::getYellowBoard() {
     return yellowBoard;
 }
 
-BlueBoard Player::getBlueBoard() const {
+BlueBoard& Player::getBlueBoard() {
     return blueBoard;
 }
 
-GreenBoard Player::getGreenBoard() const {
+GreenBoard& Player::getGreenBoard() {
     return greenBoard;
 }
 
-OrangeBoard Player::getOrangeBoard() const {
+OrangeBoard& Player::getOrangeBoard() {
     return orangeBoard;
 }
 
-PurpleBoard Player::getPurpleBoard() const {
+PurpleBoard& Player::getPurpleBoard() {
     return purpleBoard;
 }
 

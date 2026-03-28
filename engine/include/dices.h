@@ -21,7 +21,7 @@ class Dices {
     void rollDices();
     void sortDices();
     const std::vector<Dice> getDices() const;
-    Dice& getDice(int color);
+    Dice& getDice(GameColor::GameColor color);
 };
 
 }

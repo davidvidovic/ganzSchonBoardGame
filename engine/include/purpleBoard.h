@@ -29,14 +29,17 @@ class PurpleBoard : NumericBoard {
     std::vector<int> isPlayable(int diceValue) const override {
         if(currentIndex >= PURPLE_BOARD_LENGTH) return {};
         if(currentIndex < 1) return {currentIndex};
+        if(diceValue == 6) return {currentIndex};
 
-        if(diceValue > board_values[currentIndex-1])
+        if(diceValue < board_values[currentIndex-1])
             return {currentIndex};
         else
             return {};
     }
     
     void play(int diceValue) override {
+        if(isPlayable(diceValue).empty()) return;
+
         score += diceValue;
         board_values[currentIndex] = diceValue;
         board_state[currentIndex] = true;
@@ -49,13 +52,15 @@ class PurpleBoard : NumericBoard {
 
     std::string getBoardAsString() {
         std::string board;
+        int it = 0;
         for(const auto& v : board_state) {
             if(v) {
-                board.append(std::to_string(board_values[currentIndex]));
+                board.append(std::to_string(board_values[it]));
             }
             else {
                 board.append("F");
             }
+            ++it;
         }
 
         return board;

@@ -40,19 +40,6 @@ class BlueBoard : BooleanBoard {
     }
     
     void play(int coordinate) override {
-        std::vector<int> playableCoorindates = isPlayable(board_box_requirements[coordinate]);
-
-        bool playable = false;
-        for(auto& c : playableCoorindates)
-        {
-            if(c == coordinate)
-            {
-                playable = true;
-                break;
-            }
-        }
-        if(!playable) return;
-
         board_state[coordinate] = true;
         // Bonuses
     }
