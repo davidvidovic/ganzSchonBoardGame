@@ -5,8 +5,6 @@
 namespace engine
 {
 
-long long GameEngine::gameId = 0;
-
 bool GameEngine::addPlayer(Player& player) {
     if(static_cast<int>(players.size()) < 4) {
         players.push_back(player);
@@ -87,6 +85,14 @@ void GameEngine::setDiceColorLastPlayed(GameColor::GameColor color) {
 
 GameColor::GameColor GameEngine::getDiceColorLastPlayed() {
     return diceColorLastPlayed;
+}
+
+void GameEngine::setDiceIndexLastPlayed(int index) {
+    diceIndexLastPlayed = index;
+}
+
+int GameEngine::getDiceIndexLastPlayed() {
+    return diceIndexLastPlayed;
 }
 
 }

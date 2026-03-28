@@ -2,8 +2,7 @@
 
 namespace engine {
 
-Dice::Dice(GameColor::GameColor color) : color{ color } {
-    locked = false;
+Dice::Dice(GameColor::GameColor color) : color{color}, state{DiceState::AVAILABLE} {
     randomGenerator.seed(std::chrono::system_clock::now().time_since_epoch().count());
 }
 
@@ -15,12 +14,12 @@ GameColor::GameColor Dice::getColor() {
     return color; 
 }
 
-uint8_t Dice::getLocked() { 
-    return locked; 
+DiceState::DiceState Dice::getState() { 
+    return state; 
 }
 
-void Dice::setLocked(bool lockedValue) { 
-    locked = lockedValue; 
+void Dice::setState(DiceState::DiceState s) { 
+    state = s; 
 }
 
 void Dice::rollDice() {

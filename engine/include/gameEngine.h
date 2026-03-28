@@ -14,12 +14,12 @@ namespace engine
 
 class GameEngine {
     private:
-    static long long gameId;
     std::vector<Player> players;
     Dices dices;
     int round{0};
     std::vector<GameBonus::GameBonus> roundBonus{GameBonus::REROLL, GameBonus::PLUS_ONE, GameBonus::REROLL, GameBonus::UNIVERSAL_X_OR_6};
     GameColor::GameColor diceColorLastPlayed;
+    int diceIndexLastPlayed;
 
     public:
     bool addPlayer(Player& player);
@@ -36,6 +36,8 @@ class GameEngine {
     crow::json::wvalue getPlayersTurn();
     void setDiceColorLastPlayed(GameColor::GameColor color);
     GameColor::GameColor getDiceColorLastPlayed();
+    void setDiceIndexLastPlayed(int index);
+    int getDiceIndexLastPlayed();
 };
 
 }

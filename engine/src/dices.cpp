@@ -2,22 +2,24 @@
 
 namespace engine {
 
-Dices::Dices() : dices{
-    Dice(GameColor::WHITE),
-    Dice(GameColor::BLUE),
-    Dice(GameColor::YELLOW),
-    Dice(GameColor::GREEN),
-    Dice(GameColor::PURPLE),
-    Dice(GameColor::ORANGE)
-} {}
+Dices::Dices() : 
+    dices{
+        Dice(GameColor::WHITE),
+        Dice(GameColor::BLUE),
+        Dice(GameColor::YELLOW),
+        Dice(GameColor::GREEN),
+        Dice(GameColor::PURPLE),
+        Dice(GameColor::ORANGE)
+    }
+ {}
 
-const std::vector<Dice> Dices::getDices() const {
+std::vector<Dice>& Dices::getDices() {
     return dices;
 }
 
 void Dices::rollDices() {
     for(auto& dice : dices) {
-        if(!dice.getLocked())
+        if(dice.getState() == DiceState::AVAILABLE)
         {
             dice.rollDice();
         }
@@ -25,7 +27,12 @@ void Dices::rollDices() {
 }
 
 void Dices::sortDices() {
-    std::sort(dices.begin(), dices.end());
+    auto it = std::partition(dices.begin(), dices.end(),
+        [](Dice& d) {
+            return d.getState() != DiceState::AVAILABLE;
+        });
+
+    std::sort(it, dices.end());
 }
 
 Dice& Dices::getDice(GameColor::GameColor color) {

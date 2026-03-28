@@ -13,6 +13,20 @@ const int GREEN_BOARD_LENGTH = 11;
 const int ORANGE_BOARD_LENGTH = 11;
 const int PURPLE_BOARD_LENGTH = 11;
 
+namespace DiceState{
+typedef enum DiceState {LOCKED, AVAILABLE, PLAYED} DiceState;
+
+inline std::string diceStateToString(DiceState state) {
+    switch(state)
+    {
+        case LOCKED:  return "locked";
+        case AVAILABLE:   return "available";
+        case PLAYED: return "played";
+        default: return "unknown";
+    }
+}
+}
+
 }
 
 #endif

@@ -20,7 +20,7 @@ class Dices {
     Dices();
     void rollDices();
     void sortDices();
-    const std::vector<Dice> getDices() const;
+    std::vector<Dice>& getDices();
     Dice& getDice(GameColor::GameColor color);
 };
 

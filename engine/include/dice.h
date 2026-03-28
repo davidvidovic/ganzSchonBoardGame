@@ -17,7 +17,7 @@ class Dice {
     private:
     int value;
     GameColor::GameColor color;
-    bool locked;
+    DiceState::DiceState state;
 
     std::minstd_rand randomGenerator;
     std::uniform_int_distribution<> distribution;
@@ -27,9 +27,8 @@ class Dice {
 
     int getValue();
     GameColor::GameColor getColor();
-    uint8_t getLocked();
-
-    void setLocked(bool lockedValue);
+    void setState(DiceState::DiceState s);
+    DiceState::DiceState getState();
 
     void rollDice();
 

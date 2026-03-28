@@ -340,21 +340,51 @@
         .dice-container {
             margin-top: 30px;
             text-align: center;
+            min-width: 430px;
+        }
+
+        .dice-legend {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: #ddd;
+        }
+
+        .legend-pill {
+            background: #3e3e3e;
+            border-radius: 999px;
+            padding: 5px 10px;
+            border: 1px solid #666;
+        }
+
+        .dice-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
         }
 
         .dice {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 60px;
-            height: 60px;
-            font-size: 30px;
-            border-radius: 10px;
-            margin: 5px;
+            width: 72px;
+            min-height: 88px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.35);
             cursor: pointer;
             user-select: none;
-            opacity: 0.6;
-            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 4px;
+            transition: transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .dice:hover {
+            transform: translateY(-2px);
         }
 
         .dice.white {
@@ -381,6 +411,52 @@
 
         .dice.purple {
             background: #5e3b83;
+        }
+
+        .dice-face {
+            font-size: 30px;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .dice-label {
+            font-size: 11px;
+            min-height: 14px;
+            font-weight: bold;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .dice-state-available {
+            opacity: 1;
+            pointer-events: auto;
+            box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+        }
+
+        .dice-state-played {
+            opacity: 0.95;
+            pointer-events: none;
+            border-color: #84ff84;
+            box-shadow: 0 0 12px rgba(120, 255, 120, 0.35);
+        }
+
+        .dice-state-locked {
+            opacity: 0.35;
+            pointer-events: none;
+            filter: grayscale(65%);
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .dice-state-shared {
+            opacity: 0.8;
+            pointer-events: none;
+            border-color: #7db6ff;
+            box-shadow: 0 0 10px rgba(125, 182, 255, 0.25);
+        }
+
+        .dice.disabled-by-turn {
+            opacity: 0.35;
+            pointer-events: none;
         }
 
         .roll-button {
@@ -561,13 +637,37 @@
             </div>
 
             <div class="dice-container">
-                <div id="diceArea">
-                    <div class="dice" id="dice1">-</div>
-                    <div class="dice" id="dice2">-</div>
-                    <div class="dice" id="dice3">-</div>
-                    <div class="dice" id="dice4">-</div>
-                    <div class="dice" id="dice5">-</div>
-                    <div class="dice" id="dice6">-</div>
+                <div class="dice-legend">
+                    <div class="legend-pill">Normal = playable</div>
+                    <div class="legend-pill">PLAYED = used after move</div>
+                    <div class="legend-pill">LOCKED = unavailable after move</div>
+                </div>
+
+                <div id="diceArea" class="dice-row">
+                    <div class="dice dice-state-locked disabled-by-turn" id="dice1" data-index="1" data-state="locked">
+                        <div class="dice-face">-</div>
+                        <div class="dice-label">LOCKED</div>
+                    </div>
+                    <div class="dice dice-state-locked disabled-by-turn" id="dice2" data-index="2" data-state="locked">
+                        <div class="dice-face">-</div>
+                        <div class="dice-label">LOCKED</div>
+                    </div>
+                    <div class="dice dice-state-locked disabled-by-turn" id="dice3" data-index="3" data-state="locked">
+                        <div class="dice-face">-</div>
+                        <div class="dice-label">LOCKED</div>
+                    </div>
+                    <div class="dice dice-state-locked disabled-by-turn" id="dice4" data-index="4" data-state="locked">
+                        <div class="dice-face">-</div>
+                        <div class="dice-label">LOCKED</div>
+                    </div>
+                    <div class="dice dice-state-locked disabled-by-turn" id="dice5" data-index="5" data-state="locked">
+                        <div class="dice-face">-</div>
+                        <div class="dice-label">LOCKED</div>
+                    </div>
+                    <div class="dice dice-state-locked disabled-by-turn" id="dice6" data-index="6" data-state="locked">
+                        <div class="dice-face">-</div>
+                        <div class="dice-label">LOCKED</div>
+                    </div>
                 </div>
 
                 <button id="rollButton" class="roll-button" disabled>Roll Dice</button>
@@ -767,6 +867,97 @@
             document.getElementById("rollButton").disabled = !enabled;
         }
 
+        function getDieElement(index) {
+            return document.getElementById("dice" + index);
+        }
+
+        function getDieFaceElement(index) {
+            const die = getDieElement(index);
+            return die ? die.querySelector(".dice-face") : null;
+        }
+
+        function getDieLabelElement(index) {
+            const die = getDieElement(index);
+            return die ? die.querySelector(".dice-label") : null;
+        }
+
+        function setDieState(index, state) {
+            const die = getDieElement(index);
+            if (!die) return;
+
+            die.dataset.state = state;
+            die.classList.remove("dice-state-available", "dice-state-played", "dice-state-locked", "dice-state-shared");
+            die.classList.add("dice-state-" + state);
+
+            const label = getDieLabelElement(index);
+            if (!label) return;
+
+            if (state === "played") {
+                label.innerText = "PLAYED";
+            } else if (state === "locked") {
+                label.innerText = "LOCKED";
+            } else if (state === "shared") {
+                label.innerText = "OTHERS";
+            } else {
+                label.innerText = "";
+            }
+        }
+
+        function setDieColor(index, color) {
+            const die = getDieElement(index);
+            if (!die) return;
+
+            die.classList.remove("white", "blue", "yellow", "green", "orange", "purple");
+            if (color) {
+                die.classList.add(color);
+            }
+        }
+
+        function normalizeDieState(die) {
+            if (!die) return "locked";
+
+            if (die.state) {
+                return String(die.state).toLowerCase();
+            }
+
+            if (String(die.isPlayed) === "1" || die.isPlayed === true) {
+                return "played";
+            }
+
+            if (String(die.isShared) === "1" || die.isShared === true) {
+                return "shared";
+            }
+
+            if (String(die.isLocked) === "1" || die.isLocked === true) {
+                return "locked";
+            }
+
+            return "available";
+        }
+
+        function renderDice(data) {
+            for (let i = 0; i < 6; i++) {
+                const el = getDieElement(i + 1);
+                const faceEl = getDieFaceElement(i + 1);
+                const die = data ? data[i] : null;
+
+                if (!el || !faceEl) continue;
+
+                if (!die) {
+                    faceEl.innerText = "-";
+                    setDieColor(i + 1, "");
+                    setDieState(i + 1, "locked");
+                    continue;
+                }
+
+                faceEl.innerText = diceToUnicode(die.value);
+                setDieColor(i + 1, die.color);
+                setDieState(i + 1, normalizeDieState(die));
+            }
+
+            updateTurnBasedControls();
+        }
+
         function disableAllBoardSquares() {
             document.querySelectorAll(".white-square").forEach(square => {
                 square.disabled = true;
@@ -777,9 +968,10 @@
 
         function disableAllDice() {
             for (let i = 1; i <= 6; i++) {
-                const die = document.getElementById("dice" + i);
+                const die = getDieElement(i);
+                if (!die) continue;
+                die.classList.add("disabled-by-turn");
                 die.style.pointerEvents = "none";
-                die.style.opacity = "0.6";
             }
         }
 
@@ -790,13 +982,16 @@
             }
 
             for (let i = 1; i <= 6; i++) {
-                const die = document.getElementById("dice" + i);
-                if (!die.dataset.locked || die.dataset.locked === "0") {
+                const die = getDieElement(i);
+                if (!die) continue;
+
+                const state = die.dataset.state || "locked";
+                if (state === "available") {
+                    die.classList.remove("disabled-by-turn");
                     die.style.pointerEvents = "auto";
-                    die.style.opacity = "1";
                 } else {
+                    die.classList.add("disabled-by-turn");
                     die.style.pointerEvents = "none";
-                    die.style.opacity = "0.6";
                 }
             }
         }
@@ -865,31 +1060,6 @@
             }
         }
 
-        function updateDice(data) {
-            diceWereRolled = true;
-
-            for (let i = 0; i < 6; i++) {
-                const el = document.getElementById("dice" + (i + 1));
-                const die = data[i];
-
-                if (!die) {
-                    el.innerText = "-";
-                    el.classList.remove("white", "blue", "yellow", "green", "orange", "purple");
-                    el.dataset.locked = "1";
-                    el.style.pointerEvents = "none";
-                    el.style.opacity = "0.6";
-                    continue;
-                }
-
-                el.innerText = diceToUnicode(die.value);
-                el.classList.remove("white", "blue", "yellow", "green", "orange", "purple");
-                el.classList.add(die.color);
-                el.dataset.locked = (String(die.isLocked) === "1" || die.isLocked === true) ? "1" : "0";
-            }
-
-            updateTurnBasedControls();
-        }
-
         function updatePlayableSquares(playable) {
             disableAllBoardSquares();
 
@@ -912,7 +1082,7 @@
             });
         }
 
-        function updateBoard(state, playerState) {
+        function updateBoard(state, playerState, dice) {
             if (!state) return;
 
             const previousIsMyTurn = isMyTurn;
@@ -939,7 +1109,6 @@
             if (previousIsMyTurn !== isMyTurn) {
                 diceWereRolled = false;
             }
-            updateTurnBasedControls();
 
             const yellowElements = document.querySelectorAll('.white-square[data-board="yellow"]');
             yellowElements.forEach(element => {
@@ -1004,6 +1173,12 @@
                     element.innerText = state.purpleBoard[index];
                 }
             });
+
+            if (dice && Array.isArray(dice)) {
+                renderDice(dice);
+            }
+
+            updateTurnBasedControls();
         }
 
         function dicePlayed(playable) {
@@ -1067,18 +1242,20 @@
                 }
 
                 if (msg.type === "diceRolled") {
-                    updateDice(msg.dice);
+                    diceWereRolled = true;
+                    renderDice(msg.dice);
                     updatePlayableSquares(msg.playebleFields);
                     return;
                 }
 
                 if (msg.type === "updateBoard") {
-                    updateBoard(msg.state, msg.playerState);
+                    updateBoard(msg.state, msg.playerState, msg.dice || (msg.state ? msg.state.dice : null));
                     return;
                 }
 
                 if (msg.type === "dicePlayed") {
                     dicePlayed(msg.state);
+                    updateTurnBasedControls();
                     return;
                 }
             };
@@ -1170,11 +1347,15 @@
                 alert("Failed to play move.");
             }
 
+            setRollEnabled(true);
             disableAllBoardSquares();
         }
 
         async function sendDicePlayed(diceNumber) {
-            if (!hasValidName || !gameStarted) return;
+            if (!hasValidName || !gameStarted || !isMyTurn || !diceWereRolled) return;
+
+            const die = getDieElement(diceNumber);
+            if (!die || (die.dataset.state || "locked") !== "available") return;
 
             const response = await fetch("/dicePlayed", {
                 method: "POST",
@@ -1199,13 +1380,15 @@
         document.getElementById("rollButton").onclick = async () => {
             if (!hasValidName || !gameStarted || !isMyTurn) return;
 
+            setRollEnabled(false);
+
             const response = await fetch("/rollDice", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     sessionId: sessionId
                 })
-            });1
+            });
 
             if (!response.ok) {
                 alert("Failed to roll dice.");

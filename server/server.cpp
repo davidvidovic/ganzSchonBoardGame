@@ -397,7 +397,7 @@ int main()
             crow::json::wvalue obj;
             obj["color"] = engine::GameColor::gameColorToString(dices[i].getColor());
             obj["value"] = dices[i].getValue();
-            obj["isLocked"] = dices[i].getLocked() ? "1" : "0";
+            obj["state"] = engine::DiceState::diceStateToString(dices[i].getState());
             diceList[i] = std::move(obj);
         }
 
@@ -434,6 +434,19 @@ int main()
         message["state"] = player->getBoardAsJSON();
         message["playerState"] = game.getPlayersTurn();
 
+        crow::json::wvalue diceList = crow::json::wvalue::list();
+        auto dices = game.getDices().getDices();
+        for (std::size_t i = 0; i < dices.size(); ++i)
+        {
+            crow::json::wvalue obj;
+            obj["color"] = engine::GameColor::gameColorToString(dices[i].getColor());
+            obj["value"] = dices[i].getValue();
+            obj["state"] = engine::DiceState::diceStateToString(dices[i].getState());
+            diceList[i] = std::move(obj);
+        }
+
+        message["dice"] = std::move(diceList);
+
         broadcastTextLocked(message.dump());
 
         return crow::response(200);
@@ -467,6 +480,7 @@ int main()
 
         auto dice = dices[diceIndex];
         game.setDiceColorLastPlayed(dice.getColor());
+        game.setDiceIndexLastPlayed(diceIndex);
 
         std::cout << "Dice played by playerId=" << sessionIt->second.playerId
                   << ": " << engine::GameColor::gameColorToString(dice.getColor())
@@ -559,6 +573,14 @@ int main()
         std::cout << "Board move played by playerId=" << sessionIt->second.playerId
                   << ": " << boardColor
                   << " index=" << boardIndex << std::endl;
+        
+        game.getDices().getDice(game.getDiceColorLastPlayed()).setState(engine::DiceState::PLAYED);
+        for(auto i = 0; i < game.getDiceIndexLastPlayed(); i++) {
+            if(game.getDices().getDices()[i].getState() == engine::DiceState::AVAILABLE) {
+                game.getDices().getDices()[i].setState(engine::DiceState::LOCKED);
+            }
+        }
+
         switch (boardColor)
         {
             case engine::GameColor::GameColor::YELLOW:
@@ -592,7 +614,18 @@ int main()
         message["state"] = player->getBoardAsJSON();
         message["playerState"] = game.getPlayersTurn();
 
-        std::cout << player->getOrangeBoard().getBoardAsString() << std::endl;
+        crow::json::wvalue diceList = crow::json::wvalue::list();
+        auto dices = game.getDices().getDices();
+        for (std::size_t i = 0; i < dices.size(); ++i)
+        {
+            crow::json::wvalue obj;
+            obj["color"] = engine::GameColor::gameColorToString(dices[i].getColor());
+            obj["value"] = dices[i].getValue();
+            obj["state"] = engine::DiceState::diceStateToString(dices[i].getState());
+            diceList[i] = std::move(obj);
+        }
+
+        message["dice"] = std::move(diceList);
 
         sendTextToSessionLocked(sessionId, message.dump());
 
