@@ -244,33 +244,8 @@ function updatePlayableSquares(playable) {
     });
 }
 
-function updateBoard(state, playerState, dice) {
+function updateBoard(state) {
     if (!state) return;
-
-    const previousIsMyTurn = isMyTurn;
-    isMyTurn = false;
-
-    if (playerState) {
-        Object.entries(playerState).forEach(([player, turnState]) => {
-            const el = document.getElementById(player);
-
-            if (el) {
-                if (turnState === "1") {
-                    el.classList.add("played-square");
-                } else {
-                    el.classList.remove("played-square");
-                }
-            }
-
-            if (myPlayerBoxId && player === myPlayerBoxId && turnState === "1") {
-                isMyTurn = true;
-            }
-        });
-    }
-
-    if (previousIsMyTurn !== isMyTurn) {
-        diceWereRolled = false;
-    }
 
     const yellowElements = document.querySelectorAll('.white-square[data-board="yellow"]');
     yellowElements.forEach(element => {
@@ -335,6 +310,48 @@ function updateBoard(state, playerState, dice) {
             element.innerText = state.purpleBoard[index];
         }
     });
+}
+
+function updateGameInfo(gameState, playerState, dice) {
+    const previousIsMyTurn = isMyTurn;
+    isMyTurn = false;
+
+    if (gameState) {
+        for (let i = 1; i <= 4; i++) {
+            const el = document.getElementById(`round${i}`);
+            if (el) {
+                if (gameState.round === i) {
+                    el.classList.add("active-round");
+                } else {
+                    el.classList.remove("active-round");
+                }
+            }
+        }
+    }
+
+    if (playerState) {
+        Object.entries(playerState).forEach(([player, turnState]) => {
+            const el = document.getElementById(player);
+
+            el.classList.remove("active-player", "current-turn");
+
+            if (turnState === "1") {
+                el.classList.add("active-player");
+            }
+
+            if (myPlayerBoxId && player === myPlayerBoxId && turnState === "1") {
+                el.classList.add("current-turn");
+            }
+
+            if (myPlayerBoxId && player === myPlayerBoxId && turnState === "1") {
+                isMyTurn = true;
+            }
+        });
+    }
+
+    if (previousIsMyTurn !== isMyTurn) {
+        diceWereRolled = false;
+    }
 
     if (dice && Array.isArray(dice)) {
         renderDice(dice);
@@ -411,7 +428,12 @@ function connectWebSocket() {
         }
 
         if (msg.type === "updateBoard") {
-            updateBoard(msg.state, msg.playerState, msg.dice || (msg.state ? msg.state.dice : null));
+            updateBoard(msg.state);
+            return;
+        }
+
+        if (msg.type === "updateGameInfo") {
+            updateGameInfo(msg.gameState, msg.playerState, msg.dice || (msg.state ? msg.state.dice : null));
             return;
         }
 

@@ -27,6 +27,20 @@ inline std::string diceStateToString(DiceState state) {
 }
 }
 
+namespace RoundInfo {
+typedef enum RoundState {PLAYER_ON_TURN_CHOICE, OPPONENTS_CHOICE, PLUS_ONE_CHOICE} RoundState;
+
+inline std::string roundStateToString(RoundState state) {
+    switch(state)
+    {
+        case PLAYER_ON_TURN_CHOICE:  return "playerOnTurnChoice";
+        case OPPONENTS_CHOICE:   return "opponentsChoice";
+        case PLUS_ONE_CHOICE: return "plusOneChoice";
+        default: return "unknown";
+    }
+}
+}
+
 }
 
 #endif

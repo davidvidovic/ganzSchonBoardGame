@@ -22,6 +22,7 @@ class Player {
     std::string name;
     bool isTurn{false};
     int score{0};
+    int movesLeft{0};
     GreenBoard greenBoard;
     YellowBoard yellowBoard;
     BlueBoard blueBoard;
@@ -39,6 +40,8 @@ class Player {
     bool getIsTurn();
     void setBonuses(GameBonus::GameBonus bonus);
     std::vector<GameBonus::GameBonus> getBonuses();
+    void setMovesLeft(int moves);
+    int getMovesLeft();
 
     YellowBoard& getYellowBoard();
     BlueBoard& getBlueBoard();

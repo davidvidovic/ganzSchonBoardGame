@@ -150,6 +150,14 @@ crow::json::wvalue buildUpdateBoardMessageLocked(engine::Player* player)
     crow::json::wvalue message;
     message["type"] = "updateBoard";
     message["state"] = player->getBoardAsJSON();
+    return message;
+}
+
+crow::json::wvalue buildUpdateGameInfoMessageLocked()
+{
+    crow::json::wvalue message;
+    message["type"] = "updateGameInfo";
+    message["gameState"] = game.getGameState();
     message["playerState"] = game.getPlayersTurn();
     message["dice"] = buildDiceListLocked();
     return message;
@@ -325,6 +333,7 @@ int main()
         if (namedPlayers == 4)
         {
             game.startGame();
+            game.setNextRound();
         }
 
         crow::json::wvalue playersMessage = buildPlayersMessageLocked();
@@ -433,6 +442,8 @@ int main()
 
         crow::json::wvalue message = buildUpdateBoardMessageLocked(player);
         broadcastTextLocked(message.dump());
+        crow::json::wvalue gameInfoMessage = buildUpdateGameInfoMessageLocked();
+        broadcastTextLocked(gameInfoMessage.dump());
 
         return crow::response(200);
     });
@@ -603,8 +614,18 @@ int main()
                 return badRequest("Unsupported board");
         }
 
+        if(game.getPlayerOnTurn()->getMovesLeft() > 0) {
+            game.getPlayerOnTurn()->setMovesLeft(game.getPlayerOnTurn()->getMovesLeft() - 1);
+
+            if(game.getPlayerOnTurn()->getMovesLeft() < 1) {
+                game.setNextPlayerTurn();
+            }
+        }
+
         crow::json::wvalue message = buildUpdateBoardMessageLocked(player);
         sendTextToSessionLocked(sessionId, message.dump());
+        crow::json::wvalue gameInfoMessage = buildUpdateGameInfoMessageLocked();
+        broadcastTextLocked(gameInfoMessage.dump());
 
         return crow::response(200);
     });

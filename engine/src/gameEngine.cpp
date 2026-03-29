@@ -51,6 +51,7 @@ void GameEngine::sortDices() {
 
 void GameEngine::startGame() {
     players[0].setIsTurn(true);
+    players[0].setMovesLeft(3);
 }
 
 void GameEngine::assignRoundBonus() {
@@ -68,6 +69,14 @@ Player* GameEngine::findPlayerById(int playerId)
     return nullptr;
 }
 
+Player* GameEngine::getPlayerOnTurn() {
+    for (auto& p : players) {
+        if (p.getIsTurn() == true)
+            return &p;
+    }
+    return nullptr;
+}
+
 crow::json::wvalue GameEngine::getPlayersTurn() {
     crow::json::wvalue message;
 
@@ -77,6 +86,22 @@ crow::json::wvalue GameEngine::getPlayersTurn() {
     message["player1"] = players[3].getIsTurn() ? "1" : "0";
 
     return message;
+}
+
+bool GameEngine::setNextPlayerTurn() {
+    for (size_t i = 0; i < players.size(); i++) {
+        if (players[i].getIsTurn() == true) {
+            if(i == players.size() - 1) {
+                return false; // new round must start
+            }
+
+            players[i].setIsTurn(false);
+            players[i+1].setIsTurn(true);
+            return true;
+        } 
+    }
+
+    return false;
 }
 
 void GameEngine::setDiceColorLastPlayed(GameColor::GameColor color) {
@@ -93,6 +118,24 @@ void GameEngine::setDiceIndexLastPlayed(int index) {
 
 int GameEngine::getDiceIndexLastPlayed() {
     return diceIndexLastPlayed;
+}
+
+crow::json::wvalue GameEngine::getGameState() {
+    crow::json::wvalue message;
+
+    message["round"] = round;
+    message["roundSate"] = RoundInfo::roundStateToString(roundState);
+
+    return message;
+}
+
+bool GameEngine::setNextRound() {
+    round++;
+    if(round > 4) {
+        return false;
+    }
+
+    return true;
 }
 
 }

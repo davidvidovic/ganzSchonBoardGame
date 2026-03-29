@@ -17,6 +17,7 @@ class GameEngine {
     std::vector<Player> players;
     Dices dices;
     int round{0};
+    RoundInfo::RoundState roundState{RoundInfo::RoundState::PLAYER_ON_TURN_CHOICE};
     std::vector<GameBonus::GameBonus> roundBonus{GameBonus::REROLL, GameBonus::PLUS_ONE, GameBonus::REROLL, GameBonus::UNIVERSAL_X_OR_6};
     GameColor::GameColor diceColorLastPlayed;
     int diceIndexLastPlayed;
@@ -33,11 +34,15 @@ class GameEngine {
     void startGame();
     void assignRoundBonus();
     Player* findPlayerById(int playerId);
+    Player* getPlayerOnTurn();
     crow::json::wvalue getPlayersTurn();
+    bool setNextPlayerTurn();
     void setDiceColorLastPlayed(GameColor::GameColor color);
     GameColor::GameColor getDiceColorLastPlayed();
     void setDiceIndexLastPlayed(int index);
     int getDiceIndexLastPlayed();
+    crow::json::wvalue getGameState();
+    bool setNextRound();
 };
 
 }

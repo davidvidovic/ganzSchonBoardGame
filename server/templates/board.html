@@ -162,6 +162,16 @@
             border-radius: 6px;
         }
 
+        .player-info.active-player {
+            background-color: #3a3a3a;
+            border: 2px solid #4caf50;
+        }
+
+        .player-info.current-turn {
+            background-color: #5a4a00;
+            border: 2px solid #ffd54f;
+        }
+
         .arrow-square {
             width: 10px;
             height: 40px;
@@ -492,10 +502,10 @@
                 <div class="half-board">
                     <div class="sidebar-panel">
                         <div class="round-row">
-                            <div class="round-box active-round">1</div>
-                            <div class="round-box">2</div>
-                            <div class="round-box">3</div>
-                            <div class="round-box">4</div>
+                            <div class="round-box active-round" id="round1">1</div>
+                            <div class="round-box" id="round2">2</div>
+                            <div class="round-box" id="round3">3</div>
+                            <div class="round-box" id="round4">4</div>
                         </div>
                         <div class="round-row" style="margin-top:8px;">
                             <div class="board-info bonus-gray">⟳</div>

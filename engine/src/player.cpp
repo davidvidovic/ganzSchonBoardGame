@@ -37,6 +37,14 @@ std::vector<GameBonus::GameBonus> Player::getBonuses() {
     return bonuses;
 }
 
+void Player::setMovesLeft(int moves) {
+    movesLeft = moves;
+}
+
+int Player::getMovesLeft() {
+    return movesLeft;
+}
+
 YellowBoard& Player::getYellowBoard() {
     return yellowBoard;
 }
