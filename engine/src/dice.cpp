@@ -2,7 +2,7 @@
 
 namespace engine {
 
-Dice::Dice(GameColor::GameColor color) : color{color}, state{DiceState::AVAILABLE} {
+Dice::Dice(GameColor::GameColor color) : value{0}, color{color}, state{DiceState::AVAILABLE} {
     randomGenerator.seed(std::chrono::system_clock::now().time_since_epoch().count());
 }
 

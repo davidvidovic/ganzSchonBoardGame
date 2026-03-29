@@ -98,18 +98,21 @@ engine::Player* findPlayerBySessionLocked(const std::string& sessionId)
     return game.findPlayerById(it->second.playerId);
 }
 
-std::vector<crow::websocket::connection*> getAllConnectionsLocked()
+crow::json::wvalue buildDiceListLocked()
 {
-    std::vector<crow::websocket::connection*> result;
-    result.reserve(sessionsById.size());
+    crow::json::wvalue diceList = crow::json::wvalue::list();
+    auto dices = game.getDices().getDices();
 
-    for (auto& [sessionId, info] : sessionsById)
+    for (std::size_t i = 0; i < dices.size(); ++i)
     {
-        if (info.conn)
-            result.push_back(info.conn);
+        crow::json::wvalue obj;
+        obj["color"] = engine::GameColor::gameColorToString(dices[i].getColor());
+        obj["value"] = dices[i].getValue();
+        obj["state"] = engine::DiceState::diceStateToString(dices[i].getState());
+        diceList[i] = std::move(obj);
     }
 
-    return result;
+    return diceList;
 }
 
 crow::json::wvalue buildPlayersMessageLocked()
@@ -137,16 +140,18 @@ crow::json::wvalue buildPlayersMessageLocked()
     message["type"] = "playerJoined";
     message["numberOfPlayers"] = static_cast<int>(numberOfNamedPlayers);
     message["players"] = std::move(namesList);
+    message["startGame"] = (numberOfNamedPlayers == 4) ? "true" : "false";
 
-    if (numberOfNamedPlayers == 4)
-    {
-        message["startGame"] = "true";
-    }
-    else
-    {
-        message["startGame"] = "false";
-    }
+    return message;
+}
 
+crow::json::wvalue buildUpdateBoardMessageLocked(engine::Player* player)
+{
+    crow::json::wvalue message;
+    message["type"] = "updateBoard";
+    message["state"] = player->getBoardAsJSON();
+    message["playerState"] = game.getPlayersTurn();
+    message["dice"] = buildDiceListLocked();
     return message;
 }
 
@@ -200,7 +205,7 @@ int main()
         }
         while (sessionsById.find(sessionId) != sessionsById.end());
 
-        int playerId;
+        int playerId{};
         bool unique = false;
         while (!unique)
         {
@@ -277,6 +282,14 @@ int main()
         return crow::response(page);
     });
 
+    CROW_ROUTE(app, "/board.js")([]() {
+        crow::response res;
+        res.code = 200;
+        res.set_header("Content-Type", "application/javascript; charset=UTF-8");
+        res.body = crow::mustache::load_text("board.js");
+        return res;
+    });
+
     CROW_ROUTE(app, "/setName").methods("POST"_method)
     ([&](const crow::request& req) {
         auto body = crow::json::load(req.body);
@@ -298,10 +311,9 @@ int main()
         engine::Player* player = game.findPlayerById(sessionIt->second.playerId);
         if (!player)
             return notFound("Player not found");
+
         player->setName(playerName);
         sessionIt->second.hasName = true;
-
-        crow::json::wvalue playersMessage = buildPlayersMessageLocked();
 
         int namedPlayers = 0;
         for (const auto& [id, info] : sessionsById)
@@ -310,10 +322,12 @@ int main()
                 ++namedPlayers;
         }
 
-        if (namedPlayers == 4) {
+        if (namedPlayers == 4)
+        {
             game.startGame();
         }
 
+        crow::json::wvalue playersMessage = buildPlayersMessageLocked();
         broadcastTextLocked(playersMessage.dump());
 
         crow::response res(200);
@@ -389,25 +403,13 @@ int main()
         game.getDices().rollDices();
         game.getDices().sortDices();
 
-        auto dices = game.getDices().getDices();
-
-        crow::json::wvalue diceList = crow::json::wvalue::list();
-        for (std::size_t i = 0; i < dices.size(); ++i)
-        {
-            crow::json::wvalue obj;
-            obj["color"] = engine::GameColor::gameColorToString(dices[i].getColor());
-            obj["value"] = dices[i].getValue();
-            obj["state"] = engine::DiceState::diceStateToString(dices[i].getState());
-            diceList[i] = std::move(obj);
-        }
-
         crow::json::wvalue message;
         message["type"] = "diceRolled";
-        message["dice"] = std::move(diceList);
+        message["dice"] = buildDiceListLocked();
         message["playebleFields"] = player->getPlayableFieldsAsJSON(game.getDiceValues());
 
         broadcastTextLocked(message.dump());
-        
+
         return crow::response(200);
     });
 
@@ -429,24 +431,7 @@ int main()
         if (!player)
             return notFound("Player not found");
 
-        crow::json::wvalue message;
-        message["type"] = "updateBoard";
-        message["state"] = player->getBoardAsJSON();
-        message["playerState"] = game.getPlayersTurn();
-
-        crow::json::wvalue diceList = crow::json::wvalue::list();
-        auto dices = game.getDices().getDices();
-        for (std::size_t i = 0; i < dices.size(); ++i)
-        {
-            crow::json::wvalue obj;
-            obj["color"] = engine::GameColor::gameColorToString(dices[i].getColor());
-            obj["value"] = dices[i].getValue();
-            obj["state"] = engine::DiceState::diceStateToString(dices[i].getState());
-            diceList[i] = std::move(obj);
-        }
-
-        message["dice"] = std::move(diceList);
-
+        crow::json::wvalue message = buildUpdateBoardMessageLocked(player);
         broadcastTextLocked(message.dump());
 
         return crow::response(200);
@@ -563,20 +548,29 @@ int main()
             return notFound("Player not found");
 
         engine::GameColor::GameColor boardColor;
-        try {
+        try
+        {
             boardColor = engine::GameColor::stringToGameColor(body["board"].s());
-        } catch (const std::exception&) {
+        }
+        catch (const std::exception&)
+        {
             return badRequest("Invalid board");
         }
+
         int boardIndex = body["index"].i();
 
         std::cout << "Board move played by playerId=" << sessionIt->second.playerId
                   << ": " << boardColor
                   << " index=" << boardIndex << std::endl;
-        
+
         game.getDices().getDice(game.getDiceColorLastPlayed()).setState(engine::DiceState::PLAYED);
-        for(auto i = 0; i < game.getDiceIndexLastPlayed(); i++) {
-            if(game.getDices().getDices()[i].getState() == engine::DiceState::AVAILABLE) {
+
+        for (int i = 0; i < game.getDiceIndexLastPlayed(); i++)
+        {
+            if (game.getDices().getDices()[i].getState() == engine::DiceState::AVAILABLE 
+                && game.getDices().getDices()[i].getValue() < game.getDices().getDice(game.getDiceColorLastPlayed()).getValue()
+        )
+            {
                 game.getDices().getDices()[i].setState(engine::DiceState::LOCKED);
             }
         }
@@ -596,37 +590,20 @@ int main()
                 break;
 
             case engine::GameColor::GameColor::ORANGE:
-                // game.getDiceColorLastPlayed() is here because of possiblity to choose WHITE or ORANGE
-                player->getOrangeBoard().play(game.getDices().getDice(game.getDiceColorLastPlayed()).getValue());
+                player->getOrangeBoard().play(
+                    game.getDices().getDice(game.getDiceColorLastPlayed()).getValue());
                 break;
 
             case engine::GameColor::GameColor::PURPLE:
-                // game.getDiceColorLastPlayed() is here because of possiblity to choose WHITE or PURPLE
-                player->getPurpleBoard().play(game.getDices().getDice(game.getDiceColorLastPlayed()).getValue());
+                player->getPurpleBoard().play(
+                    game.getDices().getDice(game.getDiceColorLastPlayed()).getValue());
                 break;
 
             default:
                 return badRequest("Unsupported board");
         }
 
-        crow::json::wvalue message;
-        message["type"] = "updateBoard";
-        message["state"] = player->getBoardAsJSON();
-        message["playerState"] = game.getPlayersTurn();
-
-        crow::json::wvalue diceList = crow::json::wvalue::list();
-        auto dices = game.getDices().getDices();
-        for (std::size_t i = 0; i < dices.size(); ++i)
-        {
-            crow::json::wvalue obj;
-            obj["color"] = engine::GameColor::gameColorToString(dices[i].getColor());
-            obj["value"] = dices[i].getValue();
-            obj["state"] = engine::DiceState::diceStateToString(dices[i].getState());
-            diceList[i] = std::move(obj);
-        }
-
-        message["dice"] = std::move(diceList);
-
+        crow::json::wvalue message = buildUpdateBoardMessageLocked(player);
         sendTextToSessionLocked(sessionId, message.dump());
 
         return crow::response(200);
